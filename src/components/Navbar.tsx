@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X, Code2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import codniteLogo from "@/assets/codinte-logo-2-removebg-preview (1).png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +18,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center space-x-2 group">
-            <Code2 className="h-8 w-8 text-primary transition-transform group-hover:rotate-12" />
+            <img 
+              src={codniteLogo} 
+              alt="Codnite Logo" 
+              className="h-8 w-8 transition-transform group-hover:rotate-12" 
+            />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent">
               Codnite
             </span>

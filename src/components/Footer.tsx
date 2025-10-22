@@ -1,4 +1,5 @@
-import { Code2, Twitter, Github, Linkedin, Mail } from "lucide-react";
+import { Twitter, Github, Linkedin, Mail } from "lucide-react";
+import codniteLogo from "@/assets/codinte-logo-2-removebg-preview (1).png";
 
 const Footer = () => {
   const footerLinks = {
@@ -22,7 +23,11 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="col-span-2 space-y-4">
             <a href="#" className="flex items-center space-x-2 group">
-              <Code2 className="h-8 w-8 text-primary transition-transform group-hover:rotate-12" />
+              <img 
+                src={codniteLogo} 
+                alt="Codnite Logo" 
+                className="h-8 w-8 transition-transform group-hover:rotate-12" 
+              />
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent">
                 Codnite
               </span>
