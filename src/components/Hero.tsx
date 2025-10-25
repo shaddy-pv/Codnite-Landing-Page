@@ -56,8 +56,9 @@ const Hero = () => {
               size="lg" 
               variant="outline" 
               className="border-primary/50 text-foreground hover:bg-primary/10 text-lg px-8 h-14"
+              onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSf8ZovgP7JX4jj1Q0nRUAUaFWwLPmkdf8wpav3mqKfLFU6T2Q/viewform?usp=publish-editor', '_blank')}
             >
-              Learn More
+              Feedback
             </Button>
           </div>
 

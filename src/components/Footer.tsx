@@ -9,6 +9,11 @@ const Footer = () => {
     Legal: ["Privacy", "Terms", "Security", "Cookies"],
   };
 
+  const handleFooterLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    alert("Abhi naya hai yrrrr!!!!");
+  };
+
   const socialLinks = [
     { icon: Twitter, href: "#", label: "Twitter" },
     { icon: Github, href: "#", label: "GitHub" },
@@ -59,6 +64,7 @@ const Footer = () => {
                     <a
                       href="#"
                       className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                      onClick={handleFooterLinkClick}
                     >
                       {link}
                     </a>
