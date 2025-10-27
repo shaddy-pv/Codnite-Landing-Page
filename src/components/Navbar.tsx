@@ -39,7 +39,10 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <Button className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow">
+            <Button 
+              className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow"
+              onClick={() => window.open('https://codnite-frontend-production.up.railway.app/', '_blank')}
+            >
               Get Started
             </Button>
           </div>
@@ -67,7 +70,13 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <Button className="w-full bg-gradient-primary hover:opacity-90 transition-opacity">
+            <Button 
+              className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+              onClick={() => {
+                setIsOpen(false);
+                window.open('https://codnite-frontend-production.up.railway.app/', '_blank');
+              }}
+            >
               Get Started
             </Button>
           </div>
