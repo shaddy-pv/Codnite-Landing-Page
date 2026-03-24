@@ -24,7 +24,7 @@ const CTA = () => {
             <Button 
               size="lg" 
               className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow text-lg px-10 h-14 group animate-glow"
-              onClick={() => window.open('https://codnite-frontend-production.up.railway.app/', '_blank')}
+              onClick={() => window.open('https://codnite.vercel.app/', '_blank')}
             >
               Get Started Now
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
