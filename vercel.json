@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/app", "destination": "https://codnite.vercel.app" },
+    { "source": "/app/:path*", "destination": "https://codnite.vercel.app/:path*" }
+  ]
+}
