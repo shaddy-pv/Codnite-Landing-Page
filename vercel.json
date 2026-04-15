@@ -2,6 +2,12 @@
   "redirects": [
     {
       "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "codnite-landing-page.vercel.app"
+        }
+      ],
       "destination": "https://codnite.com/$1",
       "permanent": true
     }
