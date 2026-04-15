@@ -236,6 +236,12 @@ export const CodeBrain = () => {
       }
     }
 
+    // Pathway curves → screen coords
+    const pathScreens = PATHWAYS.map(p =>
+      smoothPath(p, 25).map(pt => toScreen(pt[0], pt[1], w, h))
+    );
+    pathScreensRef.current = pathScreens;
+
     // Place symbols along pathway curves (nerve fibers)
     for (const pathPts of pathScreens) {
       for (let i = 0; i < pathPts.length; i += 3) {
@@ -259,12 +265,6 @@ export const CodeBrain = () => {
     }
 
     symsRef.current = syms;
-
-    // Pathway curves → screen coords
-    const pathScreens = PATHWAYS.map(p =>
-      smoothPath(p, 25).map(pt => toScreen(pt[0], pt[1], w, h))
-    );
-    pathScreensRef.current = pathScreens;
 
     // Signal particles traveling along pathways
     const sigs: Signal[] = [];
