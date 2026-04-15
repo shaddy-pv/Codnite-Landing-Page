@@ -31,7 +31,7 @@ const steps = [
 
 export const Experience = React.memo(() => {
   return (
-    <section id="how-it-works" className="relative bg-[#0A0A0A] px-6 py-32 overflow-hidden">
+    <section id="how-it-works" className="relative bg-transparent px-6 py-32 overflow-hidden">
       {/* Section top divider */}
       <div className="absolute top-0 left-0 right-0 section-divider" />
 
@@ -77,20 +77,25 @@ export const Experience = React.memo(() => {
                   <div className="hidden lg:block absolute top-10 left-[calc(100%+4px)] w-[calc(100%-24px)] h-[1px] bg-gradient-to-r from-[#FF6A00]/20 to-transparent z-0" />
                 )}
 
-                <div className="relative bg-[#0F0F0F] rounded-2xl p-7 border border-white/[0.04] hover:border-[#FF6A00]/15 transition-all duration-500 h-full">
+                <div className="relative bg-[#0F0F0F] rounded-2xl p-7 border border-white/[0.04] hover:border-[#FF6A00]/20 transition-all duration-500 h-full hover:-translate-y-2 hover:shadow-[0_20px_50px_-15px_rgba(255,106,0,0.2)] overflow-hidden cursor-default">
+                  {/* Hover gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#FF6A00]/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+                  {/* Bottom accent line */}
+                  <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF6A00]/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out" />
+
                   {/* Step number */}
-                  <div className="text-[#FF6A00]/20 text-5xl font-bold absolute top-4 right-5 select-none">
+                  <div className="text-[#FF6A00]/20 group-hover:text-[#FF6A00]/30 text-5xl font-bold absolute top-4 right-5 select-none transition-colors duration-500">
                     {step.step}
                   </div>
 
                   <div className="relative z-10">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-5 bg-[#FF6A00]/[0.08] border border-[#FF6A00]/10 group-hover:bg-[#FF6A00]/[0.12] transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-[#FF6A00]" strokeWidth={1.5} />
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-5 bg-[#FF6A00]/[0.08] border border-[#FF6A00]/10 group-hover:bg-[#FF6A00]/[0.15] group-hover:border-[#FF6A00]/25 group-hover:shadow-[0_0_20px_-5px_rgba(255,106,0,0.3)] transition-all duration-300">
+                      <Icon className="w-5 h-5 text-[#FF6A00] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2 tracking-wide">
+                    <h3 className="text-lg font-semibold text-white mb-2 tracking-wide group-hover:text-[#FFD4A8] transition-colors duration-300">
                       {step.title}
                     </h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">
+                    <p className="text-gray-500 text-sm leading-relaxed group-hover:text-gray-400 transition-colors duration-300">
                       {step.description}
                     </p>
                   </div>

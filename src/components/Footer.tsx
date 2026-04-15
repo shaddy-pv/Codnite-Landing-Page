@@ -21,7 +21,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[#0A0A0A] border-t border-white/[0.06] px-6 py-16 md:py-20">
+    <footer className="bg-transparent border-t border-white/[0.06] px-6 py-16 md:py-20">
       <div className="max-w-7xl mx-auto">
         {/* Main footer grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">

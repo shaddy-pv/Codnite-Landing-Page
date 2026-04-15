@@ -69,7 +69,7 @@ export const Features = React.memo(() => {
     <section
       id="features"
       ref={sectionRef}
-      className="min-h-screen bg-[#0A0A0A] px-6 py-32 relative flex items-center justify-center overflow-hidden"
+      className="min-h-screen bg-transparent px-6 py-32 relative flex items-center justify-center overflow-hidden"
     >
       {/* Section top divider */}
       <div className="absolute top-0 left-0 right-0 section-divider" />

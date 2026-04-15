@@ -32,7 +32,7 @@ export const ProductReveal = React.memo(() => {
 
   return (
     <section
-      className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-6 py-32 overflow-hidden relative"
+      className="min-h-screen bg-transparent flex items-center justify-center px-6 py-32 overflow-hidden relative"
     >
       {/* Section top divider */}
       <div className="absolute top-0 left-0 right-0 section-divider" />

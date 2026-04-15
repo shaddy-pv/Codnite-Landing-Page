@@ -17,6 +17,7 @@ const Experience = lazy(() => import('@/components/Experience'));
 const CTA = lazy(() => import('@/components/CTA'));
 const Footer = lazy(() => import('@/components/Footer'));
 const FeedbackButton = lazy(() => import('@/components/FeedbackButton'));
+const StarryBackground = lazy(() => import('@/components/StarryBackground'));
 
 const Index = () => {
   const [loadingComplete, setLoadingComplete] = useState(false);
@@ -54,6 +55,7 @@ const Index = () => {
       <Hero />
 
       <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A]" />}>
+        <StarryBackground />
         <Problem />
         <ProductReveal />
         <Features />

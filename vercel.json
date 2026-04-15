@@ -1,12 +1,9 @@
 {
-  "routes": [
+  "redirects": [
     {
-      "src": "/app",
-      "dest": "https://codnite.vercel.app"
-    },
-    {
-      "src": "/app/(.*)",
-      "dest": "https://codnite.vercel.app/$1"
+      "source": "/(.*)",
+      "destination": "https://codnite.com/$1",
+      "permanent": true
     }
   ]
 }

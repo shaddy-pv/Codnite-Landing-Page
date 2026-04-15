@@ -4,7 +4,7 @@ import { ArrowRight, Eye } from 'lucide-react';
 
 export const CTA = React.memo(() => {
   return (
-    <section className="min-h-[80vh] bg-[#0A0A0A] flex items-center justify-center px-6 py-32 relative overflow-hidden">
+    <section className="min-h-[80vh] bg-transparent flex items-center justify-center px-6 py-32 relative overflow-hidden">
       {/* Cinematic noise and glows */}
       <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none z-0" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.08)_0%,transparent_60%)] blur-3xl mix-blend-screen pointer-events-none" />

@@ -9,7 +9,7 @@ export const Problem = React.memo(() => {
   ];
 
   return (
-    <section className="min-h-[80vh] bg-[#0A0A0A] flex flex-col items-center justify-center px-6 py-24 relative overflow-hidden">
+    <section className="min-h-[80vh] bg-transparent flex flex-col items-center justify-center px-6 py-24 relative overflow-hidden">
       {/* Subtle Background Elements */}
       <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_70%)] blur-3xl mix-blend-screen pointer-events-none" />
       <div className="absolute bottom-[10%] left-[-10%] w-[30%] h-[30%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.04)_0%,transparent_70%)] blur-3xl mix-blend-screen pointer-events-none" />
