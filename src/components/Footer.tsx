@@ -1,89 +1,58 @@
-import { Twitter, Github, Linkedin, Mail } from "lucide-react";
-import codniteLogo from "@/assets/codinte-logo-2-removebg-preview (1).png";
+import { motion } from 'framer-motion';
 
-const Footer = () => {
-  const footerLinks = {
-    Product: ["Features", "Pricing", "Documentation", "Changelog"],
-    Company: ["About", "Blog", "Careers", "Press Kit"],
-    Resources: ["Community", "Tutorials", "Support", "API"],
-    Legal: ["Privacy", "Terms", "Security", "Cookies"],
-  };
-
-  const handleFooterLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    alert("Abhi naya hai yrrrr!!!!");
-  };
-
-  const socialLinks = [
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Github, href: "#", label: "GitHub" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Mail, href: "#", label: "Email" },
+export const Footer = () => {
+  const links = [
+    { label: 'About', href: '#' },
+    { label: 'Features', href: '#' },
+    { label: 'Pricing', href: '#' },
+    { label: 'Contact', href: '#' }
   ];
 
   return (
-    <footer className="border-t border-border bg-secondary/30">
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
-          {/* Brand Column */}
-          <div className="col-span-2 space-y-4">
-            <a href="#" className="flex items-center space-x-2 group">
-              <img 
-                src={codniteLogo} 
-                alt="Codnite Logo" 
-                className="h-8 w-8 transition-transform group-hover:rotate-12" 
-              />
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent">
-                Codnite
-              </span>
-            </a>
-            <p className="text-muted-foreground max-w-xs">
-              Empowering developers worldwide to collaborate, innovate, and build the future together.
-            </p>
-            <div className="flex gap-4 pt-2">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="p-2 bg-secondary hover:bg-primary/10 rounded-lg transition-all hover:scale-110"
-                >
-                  <social.icon className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
-                </a>
-              ))}
+    <footer className="bg-[#0A0A0A] border-t border-gray-900 px-6 py-16">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="flex items-center gap-3"
+          >
+            <div className="w-10 h-10 bg-[#FF6A00] rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">C</span>
             </div>
-          </div>
+            <span className="text-white font-bold text-2xl">Codnite</span>
+          </motion.div>
 
-          {/* Links Columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className="space-y-3">
-              <h3 className="font-semibold text-foreground">{category}</h3>
-              <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm"
-                      onClick={handleFooterLinkClick}
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true }}
+            className="flex gap-8"
+          >
+            {links.map((link, index) => (
+              <a
+                key={index}
+                href={link.href}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </motion.div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2025 Codnite. All rights reserved.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Codnite- United By Code
-          </p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="mt-12 pt-8 border-t border-gray-900 text-center text-gray-500 text-sm"
+        >
+          © 2026 Codnite. Built for developers who build.
+        </motion.div>
       </div>
     </footer>
   );

@@ -1,51 +1,79 @@
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { motion } from 'framer-motion';
 
-const CTA = () => {
+export const CTA = React.memo(() => {
   return (
-    <section className="py-24 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-orange-500/10 to-primary/10" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 rounded-full blur-3xl" />
-      
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <h2 className="text-4xl md:text-6xl font-bold leading-tight">
-            Ready to <span className="text-primary">Transform</span>
-            <br />
-            Your Development Journey?
-          </h2>
-          
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-            Join now and enjoy the environment of Codnite.
-          </p>
+    <section className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-6 py-32 relative overflow-hidden">
+      {/* Cinematic noise and glows */}
+      <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.1)_0%,transparent_60%)] blur-3xl mix-blend-screen pointer-events-none" />
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button 
-              size="lg" 
-              className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow text-lg px-10 h-14 group animate-glow"
-              onClick={() => window.open('https://codnite.vercel.app/', '_blank')}
-            >
-              Get Started Now
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-primary/50 text-foreground hover:bg-primary/10 text-lg px-10 h-14"
-              onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSf8ZovgP7JX4jj1Q0nRUAUaFWwLPmkdf8wpav3mqKfLFU6T2Q/viewform?usp=publish-editor', '_blank')}
-            >
-              Feedback
-            </Button>
-          </div>
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { 
+            opacity: 1, 
+            transition: { staggerChildren: 0.2 } 
+          }
+        }}
+        className="max-w-4xl text-center relative z-10"
+      >
+        <motion.h2
+          variants={{
+            hidden: { opacity: 0, y: 40 },
+            visible: { 
+              opacity: 1, 
+              y: 0, 
+              transition: { duration: 0.8, ease: "easeOut" } 
+            }
+          }}
+          className="text-[4rem] md:text-7xl font-bold text-white mb-12 leading-[1.1] tracking-tight"
+        >
+          Ready to stop watching
+          <br />
+          and start <span className="text-[#FF6A00] animate-pulse-glow inline-block rounded-sm px-1">building</span>?
+        </motion.h2>
 
-          <p className="text-sm text-muted-foreground pt-4">
-           And Please Don't forget to Uplaod a Post with #Codnite-UnitedByCode.
-          </p>
-        </div>
-      </div>
+        <motion.div
+           variants={{
+            hidden: { opacity: 0, y: 40 },
+            visible: { 
+              opacity: 1, 
+              y: 0, 
+              transition: { duration: 0.8, ease: "easeOut" } 
+            }
+          }}
+        >
+          <button
+            className="magnetic-btn cta-breathe group relative px-12 py-5 bg-[#FF6A00] text-white text-xl font-medium rounded-full hover:bg-[hsl(24,100%,55%)] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,106,0,0.5)] hover:shadow-[0_0_60px_-15px_rgba(255,106,0,0.7)] hover:-translate-y-1 overflow-hidden"
+            data-cursor-hover
+          >
+            <span className="relative z-10 flex items-center gap-3">
+              Join Codnite
+            </span>
+            <div className="absolute inset-0 rounded-full border border-white/20 edge-highlight pointer-events-none" />
+          </button>
+        </motion.div>
+
+        <motion.p
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { 
+              opacity: 1, 
+              y: 0, 
+              transition: { duration: 0.8, ease: "easeOut" } 
+            }
+          }}
+          className="text-gray-500/80 mt-10 text-sm font-medium tracking-wide uppercase"
+        >
+          No credit card required
+        </motion.p>
+      </motion.div>
     </section>
   );
-};
+});
 
 export default CTA;
