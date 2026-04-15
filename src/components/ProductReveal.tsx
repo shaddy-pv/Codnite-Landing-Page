@@ -25,7 +25,7 @@ export const ProductReveal = React.memo(() => {
 
   const highlights = [
     { label: 'Monaco Code Editor', description: 'Write, run, and debug code directly in your browser', color: '#FF6A00' },
-    { label: '1v1 Code Battles', description: 'Challenge anyone — same problem, fastest clean solution wins', color: '#FFB340' },
+    { label: '1v1 Code Battles', description: 'Challenge anyone - same problem, fastest clean solution wins', color: '#FFB340' },
     { label: 'College Communities', description: 'Join your university hub. Team battles, shared rankings', color: '#FF8533' },
     { label: 'XP & Leaderboards', description: 'Earn points, unlock badges, climb college and global ranks', color: '#FF6A00' }
   ];
@@ -60,7 +60,7 @@ export const ProductReveal = React.memo(() => {
             viewport={{ once: true, margin: "-100px" }}
             className="text-lg md:text-xl text-gray-400/90 leading-relaxed max-w-[500px]"
           >
-            Solve problems, battle other developers, and grow with your college community — all from your browser.
+            Solve problems, battle other developers, and grow with your college community - all from your browser.
           </motion.p>
 
           <motion.div

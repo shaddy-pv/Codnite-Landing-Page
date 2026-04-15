@@ -12,13 +12,13 @@ export const Features = React.memo(() => {
   const features = [
     {
       title: '1v1 Code Battles',
-      description: 'Challenge friends or get matched with developers at your level. Same problem, same clock — fastest clean solution wins. Spectators can watch live.',
+      description: 'Challenge friends or get matched with developers at your level. Same problem, same clock - fastest clean solution wins. Spectators can watch live.',
       icon: Swords,
       gradient: 'from-[#FF6A00]/15 to-transparent',
       accentColor: '#FF6A00',
     },
     {
-      title: '100+ Coding Problems',
+      title: '1000+ Coding Problems',
       description: 'From arrays to dynamic programming. Write real code in our Monaco editor, run against test cases, get instant feedback on every submission.',
       icon: Code2,
       gradient: 'from-[#FFB340]/15 to-transparent',

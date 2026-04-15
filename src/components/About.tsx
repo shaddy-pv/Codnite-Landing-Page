@@ -11,9 +11,9 @@ const About = () => {
               About <span className="text-primary">Codnite</span>
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Codnite was born from a simple belief: developers are stronger together. We're building 
-              a platform where collaboration isn't just encouraged—it's effortless. Whether you're 
-              a beginner taking your first steps or a seasoned pro crafting the next big thing, 
+              Codnite was born from a simple belief: developers are stronger together. We're building
+              a platform where collaboration isn't just encouraged-it's effortless. Whether you're
+              a beginner taking your first steps or a seasoned pro crafting the next big thing,
               Codnite is your home for innovation.
             </p>
           </div>
