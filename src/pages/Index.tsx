@@ -9,7 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Lazy load below-fold sections — these don't render until scrolled to
+// Lazy load below-fold sections
 const Problem = lazy(() => import('@/components/Problem'));
 const ProductReveal = lazy(() => import('@/components/ProductReveal'));
 const Features = lazy(() => import('@/components/Features'));
@@ -47,8 +47,6 @@ const Index = () => {
   return (
     <div className="bg-[#0A0A0A] overflow-x-hidden relative selection:bg-orange-500/30 selection:text-orange-200">
       <CustomCursor />
-
-      {/* SymbolParticles REMOVED — redundant with CodeBrain floaters, was a separate rAF loop */}
 
       {!loadingComplete && <Loader onComplete={() => setLoadingComplete(true)} />}
 

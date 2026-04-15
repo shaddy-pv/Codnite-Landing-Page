@@ -1,9 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 export const ProductReveal = React.memo(() => {
-  const sectionRef = useRef<HTMLElement>(null);
-  
   // 3D Mouse Parallax
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -16,17 +14,8 @@ export const ProductReveal = React.memo(() => {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    
-    x.set(xPct);
-    y.set(yPct);
+    x.set(e.clientX / rect.width - 0.5);
+    y.set(e.clientY / rect.height - 0.5);
   };
 
   const handleMouseLeave = () => {
@@ -34,18 +23,20 @@ export const ProductReveal = React.memo(() => {
     y.set(0);
   };
 
-  const features = [
-    { label: 'Code Editor', color: '#FF6A00' },
-    { label: 'Real-time Collaboration', color: '#00D9FF' },
-    { label: 'Challenges', color: '#FFB340' },
-    { label: 'Progress Tracking', color: '#10B981' }
+  const highlights = [
+    { label: 'Monaco Code Editor', description: 'Write, run, and debug code directly in your browser', color: '#FF6A00' },
+    { label: '1v1 Code Battles', description: 'Challenge anyone — same problem, fastest clean solution wins', color: '#FFB340' },
+    { label: 'College Communities', description: 'Join your university hub. Team battles, shared rankings', color: '#FF8533' },
+    { label: 'XP & Leaderboards', description: 'Earn points, unlock badges, climb college and global ranks', color: '#FF6A00' }
   ];
 
   return (
     <section
-      ref={sectionRef}
-      className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-6 py-32 overflow-hidden"
+      className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-6 py-32 overflow-hidden relative"
     >
+      {/* Section top divider */}
+      <div className="absolute top-0 left-0 right-0 section-divider" />
+
       <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
         <div className="space-y-10">
           <motion.h2
@@ -53,11 +44,13 @@ export const ProductReveal = React.memo(() => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] tracking-tight"
           >
-            Codnite is not a platform.
+            Codnite is not just a platform.
             <br />
-            It's a <span className="text-[#FF6A00] drop-shadow-sm">coding environment</span>.
+            It's a <span className="text-transparent bg-clip-text" style={{
+              backgroundImage: 'linear-gradient(135deg, #FF6A00, #FFB340)',
+            }}>coding arena</span>.
           </motion.h2>
 
           <motion.p
@@ -65,46 +58,51 @@ export const ProductReveal = React.memo(() => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
-            className="text-xl text-gray-400/90 leading-relaxed max-w-[500px]"
+            className="text-lg md:text-xl text-gray-400/90 leading-relaxed max-w-[500px]"
           >
-            Learn, build, compete, and grow — all directly from your browser.
+            Solve problems, battle other developers, and grow with your college community — all from your browser.
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             variants={{
               hidden: { opacity: 0 },
-              visible: { 
-                opacity: 1, 
-                transition: { staggerChildren: 0.1, delayChildren: 0.4 } 
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1, delayChildren: 0.4 }
               }
             }}
             className="space-y-5 lg:mt-12"
           >
-            {features.map((feature, index) => (
+            {highlights.map((feature, index) => (
               <motion.div
                 key={index}
                 variants={{
                   hidden: { opacity: 0, x: -20 },
                   visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } }
                 }}
-                className="flex items-center gap-4 group"
+                className="flex items-start gap-4 group"
               >
                 <div
-                  className="w-2.5 h-2.5 rounded-full transition-transform duration-300 group-hover:scale-150"
-                  style={{ backgroundColor: feature.color, boxShadow: `0 0 15px ${feature.color}` }}
+                  className="w-2.5 h-2.5 rounded-full transition-all duration-300 group-hover:scale-150 mt-2 flex-shrink-0"
+                  style={{ backgroundColor: feature.color, boxShadow: `0 0 15px ${feature.color}40` }}
                 />
-                <span className="text-gray-300/90 text-lg font-medium tracking-wide group-hover:text-white transition-colors duration-300">
-                  {feature.label}
-                </span>
+                <div>
+                  <span className="text-gray-200 text-lg font-medium tracking-wide group-hover:text-white transition-colors duration-300 block">
+                    {feature.label}
+                  </span>
+                  <span className="text-gray-500 text-sm mt-0.5 block">
+                    {feature.description}
+                  </span>
+                </div>
               </motion.div>
             ))}
           </motion.div>
         </div>
 
-        {/* 3D Mockup area */}
+        {/* 3D Mockup — realistic Codnite session */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 40 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -115,41 +113,93 @@ export const ProductReveal = React.memo(() => {
           onMouseLeave={handleMouseLeave}
           style={{ perspective: "1200px", transformStyle: "preserve-3d" }}
         >
-          {/* Subtle background glow for the mockup */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#FF6A00]/5 blur-[100px] rounded-full pointer-events-none" />
+          {/* Background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#FF6A00]/[0.04] blur-[100px] rounded-full pointer-events-none" />
 
-          <motion.div 
+          <motion.div
             style={{ rotateX, rotateY }}
-            className="relative bg-[#0F0F12] rounded-2xl p-8 border border-gray-800/80 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] will-change-transform backdrop-blur-xl"
+            className="relative bg-[#0F0F0F] rounded-2xl p-6 md:p-8 border border-white/[0.06] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] will-change-transform backdrop-blur-xl"
           >
-            <div className="flex gap-2.5 mb-8">
-              <div className="w-3 h-3 rounded-full bg-[#FF5F56]/80 hover:bg-[#FF5F56] transition-colors"></div>
-              <div className="w-3 h-3 rounded-full bg-[#FFBD2E]/80 hover:bg-[#FFBD2E] transition-colors"></div>
-              <div className="w-3 h-3 rounded-full bg-[#27C93F]/80 hover:bg-[#27C93F] transition-colors"></div>
+            {/* Window chrome */}
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="w-3 h-3 rounded-full bg-[#FF5F56]/80"></div>
+              <div className="w-3 h-3 rounded-full bg-[#FFBD2E]/80"></div>
+              <div className="w-3 h-3 rounded-full bg-[#27C93F]/80"></div>
+              <span className="text-gray-600 text-xs font-mono ml-3">codnite — battle_arena.ts</span>
             </div>
 
-            <div className="space-y-4 font-mono text-sm md:text-base selection:bg-[#FF6A00]/30 selection:text-white pb-6">
-              <div className="text-[#FFB340]">
-                <span className="text-[#FA70AD]">const</span> buildFuture = () =&gt; {'{'}
+            {/* Realistic code editor content */}
+            <div className="space-y-3 font-mono text-[13px] md:text-sm selection:bg-[#FF6A00]/30 selection:text-white pb-4">
+              <div>
+                <span className="text-gray-600">1  </span>
+                <span className="text-[#FA70AD]">import</span>
+                <span className="text-gray-300"> {'{'} </span>
+                <span className="text-[#92C5F9]">Battle</span>
+                <span className="text-gray-300">{', '}</span>
+                <span className="text-[#92C5F9]">Problem</span>
+                <span className="text-gray-300"> {'}'} </span>
+                <span className="text-[#FA70AD]">from</span>
+                <span className="text-[#86F28E]"> '@codnite/arena'</span>
               </div>
-              <div className="pl-6 text-[#92C5F9]">
-                <span className="text-gray-500">return</span> <span className="text-[#86F28E]">'together'</span>;
-                <span className="inline-block w-[8px] h-[1em] bg-[#FF6A00] ml-1 align-middle animate-blink ml-1"></span>
+              <div>
+                <span className="text-gray-600">2  </span>
               </div>
-              <div className="text-[#FFB340]">{'}'}</div>
+              <div>
+                <span className="text-gray-600">3  </span>
+                <span className="text-[#FA70AD]">const</span>
+                <span className="text-[#92C5F9]"> challenge</span>
+                <span className="text-gray-300"> = </span>
+                <span className="text-[#FFB340]">Battle</span>
+                <span className="text-gray-300">.create({'{'}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">4  </span>
+                <span className="text-gray-300 pl-6">mode: </span>
+                <span className="text-[#86F28E]">'1v1'</span>
+                <span className="text-gray-300">,</span>
+              </div>
+              <div>
+                <span className="text-gray-600">5  </span>
+                <span className="text-gray-300 pl-6">problem: </span>
+                <span className="text-[#86F28E]">'two-sum'</span>
+                <span className="text-gray-300">,</span>
+              </div>
+              <div>
+                <span className="text-gray-600">6  </span>
+                <span className="text-gray-300 pl-6">spectators: </span>
+                <span className="text-[#FFB340]">true</span>
+              </div>
+              <div>
+                <span className="text-gray-600">7  </span>
+                <span className="text-gray-300">{'})'}</span>
+                <span className="inline-block w-[8px] h-[1em] bg-[#FF6A00] ml-1 align-middle animate-blink"></span>
+              </div>
+            </div>
+
+            {/* Bottom status bar */}
+            <div className="flex items-center justify-between pt-4 border-t border-white/[0.04] text-xs font-mono">
+              <div className="flex items-center gap-4">
+                <span className="text-[#27C93F] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#27C93F] animate-pulse"></span>
+                  Connected
+                </span>
+                <span className="text-gray-600">TypeScript</span>
+              </div>
+              <span className="text-gray-600">Ln 7, Col 3</span>
             </div>
 
             {/* Floating Tags */}
-            <div className="absolute -top-5 -right-5 bg-[#FF6A00] text-white px-5 py-2 rounded-full text-sm font-semibold shadow-[0_10px_20px_-5px_rgba(255,106,0,0.5)] border border-[#FF6A00]/50 backdrop-blur-sm z-20">
-              Live
+            <div className="absolute -top-4 -right-4 bg-[#FF6A00] text-white px-4 py-1.5 rounded-full text-xs font-semibold shadow-[0_10px_20px_-5px_rgba(255,106,0,0.5)] border border-[#FF6A00]/50 backdrop-blur-sm z-20 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+              Live Battle
             </div>
 
-            <div className="absolute -bottom-6 -left-8 bg-black/80 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-2xl border border-gray-800/80 backdrop-blur-md z-20 flex items-center gap-3">
+            <div className="absolute -bottom-5 -left-6 bg-[#0A0A0A]/90 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-2xl border border-white/[0.06] backdrop-blur-md z-20 flex items-center gap-2.5">
               <div className="flex -space-x-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 border border-black"></div>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-red-500 border border-black"></div>
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 border border-black"></div>
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-red-500 border border-black"></div>
               </div>
-              2 developers coding
+              2 devs battling
             </div>
           </motion.div>
         </motion.div>

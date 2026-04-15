@@ -110,7 +110,7 @@ export const Hero = () => {
         {/* Deep amber bottom-right glow */}
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,140,0,0.08)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
         {/* Center ambient glow */}
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.05)_0%,transparent_60%)] blur-3xl mix-blend-screen" />
+        <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.05)_0%,transparent_60%)] blur-3xl mix-blend-screen" />
         {/* Subtle fiery red top accent */}
         <div className="absolute top-[-5%] right-[20%] w-[40%] h-[40%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,50,0,0.08)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
       </motion.div>
@@ -120,29 +120,29 @@ export const Hero = () => {
         <CodeBrain />
       </div>
 
-      {/* Foreground Text Layer — elevated above brain with backdrop for legibility */}
+      {/* Foreground Text Layer — pointer-events-none so mouse passes to brain canvas */}
       <motion.div
         style={{ y: yText }}
-        className="relative z-10 text-center px-6 max-w-5xl"
+        className="relative z-10 text-center px-6 max-w-5xl pointer-events-none"
       >
         {/* Top badge */}
         <div
           ref={badgeRef}
-          className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full border border-[#FF6A00]/20 bg-[#FF6A00]/5 backdrop-blur-sm"
+          className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full border border-[#FF6A00]/20 bg-[#FF6A00]/[0.06] backdrop-blur-md"
           style={{ opacity: 0 }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] animate-pulse" />
-          <span className="text-[#FF6A00]/80 text-xs font-mono tracking-wider uppercase">
+          <span className="text-[#FF6A00]/90 text-xs font-mono tracking-wider uppercase">
             Developer Platform — Now Live
           </span>
         </div>
 
         <h1
           ref={headlineRef}
-          className="text-[3.5rem] md:text-[5.5rem] font-bold text-white mb-6 tracking-tight leading-[1.08]"
+          className="text-[3.2rem] sm:text-[4rem] md:text-[5.5rem] font-bold text-white mb-6 tracking-tight leading-[1.05]"
           style={{
             opacity: 0,
-            textShadow: '0 0 60px rgba(0,0,0,0.8), 0 2px 20px rgba(0,0,0,0.5)',
+            textShadow: '0 0 60px rgba(0,0,0,0.95), 0 4px 20px rgba(0,0,0,0.7)',
           }}
         >
           Build. Collaborate.
@@ -151,7 +151,7 @@ export const Hero = () => {
             className="text-transparent bg-clip-text"
             style={{
               backgroundImage: 'linear-gradient(135deg, #FF6A00 0%, #FFB340 50%, #FF6A00 100%)',
-              filter: 'drop-shadow(0 0 30px rgba(255,106,0,0.4))',
+              filter: 'drop-shadow(0 0 40px rgba(255,106,0,0.5))',
             }}
           >
             Dominate Code.
@@ -160,19 +160,20 @@ export const Hero = () => {
 
         <p
           ref={subRef}
-          className="text-lg md:text-2xl text-gray-400/90 mb-12 max-w-[700px] mx-auto leading-relaxed"
+          className="text-base sm:text-lg md:text-2xl text-gray-400/90 mb-12 max-w-[700px] mx-auto leading-relaxed"
           style={{
             opacity: 0,
-            textShadow: '0 0 30px rgba(0,0,0,0.6)',
+            textShadow: '0 0 20px rgba(0,0,0,0.7)',
           }}
         >
           Codnite is where developers stop learning alone and start building together.
         </p>
 
-        <div ref={ctaRef} style={{ opacity: 0 }}>
+        {/* CTA buttons — re-enable pointer-events for clickable elements */}
+        <div ref={ctaRef} className="flex flex-col items-center gap-4 pointer-events-auto" style={{ opacity: 0 }}>
           <button
             onClick={() => window.location.href = '/app'}
-            className="magnetic-btn cta-breathe group relative px-8 py-4 bg-[#FF6A00] text-white text-lg font-medium rounded-full hover:bg-[hsl(24,100%,55%)] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,106,0,0.5)] hover:shadow-[0_0_60px_-15px_rgba(255,106,0,0.7)] hover:-translate-y-1 overflow-hidden"
+            className="magnetic-btn cta-breathe group relative px-8 py-4 bg-[#FF6A00] text-white text-lg font-semibold rounded-full hover:bg-[hsl(24,100%,55%)] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,106,0,0.5)] hover:shadow-[0_0_60px_-15px_rgba(255,106,0,0.7)] hover:-translate-y-1 overflow-hidden"
             data-cursor-hover
           >
             <span className="relative z-10 flex items-center gap-2">
@@ -181,6 +182,7 @@ export const Hero = () => {
             </span>
             <div className="absolute inset-0 rounded-full border border-white/20 edge-highlight pointer-events-none" />
           </button>
+          <span className="text-gray-600 text-xs font-medium tracking-widest uppercase">Free to join • No credit card</span>
         </div>
       </motion.div>
 

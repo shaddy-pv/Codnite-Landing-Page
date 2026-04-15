@@ -6,23 +6,24 @@
 
 @layer base {
   :root {
-    --background: 220 15% 8%;
-    --foreground: 0 0% 98%;
+    /* Ember Flow Theme — warm neutrals with orange accent */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
 
-    --card: 220 15% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 220 15% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 96%;
 
     --primary: 24 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 20 8% 12%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 20 6% 15%;
+    --muted-foreground: 0 0% 60%;
 
     --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
@@ -30,37 +31,50 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
+    --border: 20 6% 14%;
+    --input: 20 6% 14%;
     --ring: 24 100% 50%;
 
     --radius: 0.75rem;
     
     --gradient-primary: linear-gradient(135deg, hsl(24 100% 50%), hsl(20 100% 45%));
-    --gradient-hero: linear-gradient(180deg, hsl(220 15% 8%), hsl(220 15% 12%));
+    --gradient-hero: linear-gradient(180deg, #0A0A0A, #0D0800);
     --glow-primary: 0 0 60px hsla(24 100% 50% / 0.3);
     --shadow-elevated: 0 20px 40px -10px hsla(0 0% 0% / 0.5);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 220 15% 8%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
   }
 
   * {
     @apply border-border;
   }
 
+  /* ─── Hide default cursor globally ─── */
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+
   body {
     @apply bg-[#0A0A0A] text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    cursor: none; /* Hide default cursor for custom cursor */
+    cursor: none !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
     /* Critical: must be auto or it fights Lenis JS scroll engine */
     scroll-behavior: auto;
+  }
+
+  /* Ensure inputs/textareas also hide cursor */
+  input, textarea, select, a, button,
+  [role="button"], [tabindex] {
+    cursor: none !important;
   }
 }
 
@@ -125,7 +139,7 @@
     50% { box-shadow: 0 0 40px hsla(24, 100%, 50%, 0.6); }
   }
 
-  /* === NEW: Breathing CTA effect === */
+  /* === Breathing CTA effect === */
   .cta-breathe {
     animation: breathe 3s ease-in-out infinite;
   }
@@ -146,7 +160,7 @@
     animation: none;
   }
 
-  /* === NEW: Fade-in-up for loader text === */
+  /* === Fade-in-up for loader text === */
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -164,7 +178,7 @@
     50% { opacity: 1; transform: scale(1.15); }
   }
 
-  /* === NEW: Button scale + glow interaction === */
+  /* === Button scale + glow interaction === */
   .magnetic-btn {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                 box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -177,6 +191,28 @@
 
   .magnetic-btn:active {
     transform: translateY(0) scale(0.98);
+  }
+
+  /* === Gradient text utility === */
+  .text-gradient-ember {
+    background: linear-gradient(135deg, #FF6A00 0%, #FFB340 50%, #FF6A00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* === Glassmorphism card === */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* === Section divider line === */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.15), transparent);
   }
 }
 
@@ -200,7 +236,10 @@
 
 /* === Mobile: restore default cursor === */
 @media (max-width: 767px) {
+  *, *::before, *::after {
+    cursor: auto !important;
+  }
   body {
-    cursor: auto;
+    cursor: auto !important;
   }
 }
