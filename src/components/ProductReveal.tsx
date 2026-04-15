@@ -37,7 +37,7 @@ export const ProductReveal = React.memo(() => {
   const features = [
     { label: 'Code Editor', color: '#FF6A00' },
     { label: 'Real-time Collaboration', color: '#00D9FF' },
-    { label: 'Challenges', color: '#7C3AED' },
+    { label: 'Challenges', color: '#FFB340' },
     { label: 'Progress Tracking', color: '#10B981' }
   ];
 
@@ -129,14 +129,14 @@ export const ProductReveal = React.memo(() => {
             </div>
 
             <div className="space-y-4 font-mono text-sm md:text-base selection:bg-[#FF6A00]/30 selection:text-white pb-6">
-              <div className="text-[#B9A1F2]">
+              <div className="text-[#FFB340]">
                 <span className="text-[#FA70AD]">const</span> buildFuture = () =&gt; {'{'}
               </div>
               <div className="pl-6 text-[#92C5F9]">
                 <span className="text-gray-500">return</span> <span className="text-[#86F28E]">'together'</span>;
                 <span className="inline-block w-[8px] h-[1em] bg-[#FF6A00] ml-1 align-middle animate-blink ml-1"></span>
               </div>
-              <div className="text-[#B9A1F2]">{'}'}</div>
+              <div className="text-[#FFB340]">{'}'}</div>
             </div>
 
             {/* Floating Tags */}
@@ -146,7 +146,7 @@ export const ProductReveal = React.memo(() => {
 
             <div className="absolute -bottom-6 -left-8 bg-black/80 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-2xl border border-gray-800/80 backdrop-blur-md z-20 flex items-center gap-3">
               <div className="flex -space-x-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 border border-black"></div>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 border border-black"></div>
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-red-500 border border-black"></div>
               </div>
               2 developers coding

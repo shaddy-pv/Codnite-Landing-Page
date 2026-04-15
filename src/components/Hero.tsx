@@ -95,7 +95,7 @@ export const Hero = () => {
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden flex items-center justify-center"
       style={{
-        background: 'linear-gradient(180deg, #0A0A0A 0%, #0D0818 40%, #0A0A0A 100%)',
+        background: 'linear-gradient(180deg, #0A0A0A 0%, #0D0500 40%, #0A0A0A 100%)',
       }}
     >
       <div className="absolute inset-0 bg-noise pointer-events-none z-0" />
@@ -107,12 +107,12 @@ export const Hero = () => {
       >
         {/* Orange top-left glow */}
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.12)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
-        {/* Deep purple bottom-right glow */}
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[radial-gradient(circle_at_center,rgba(100,50,250,0.1)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
+        {/* Deep amber bottom-right glow */}
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,140,0,0.08)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
         {/* Center ambient glow */}
         <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.05)_0%,transparent_60%)] blur-3xl mix-blend-screen" />
-        {/* Subtle purple top accent */}
-        <div className="absolute top-[-5%] right-[20%] w-[40%] h-[40%] rounded-full bg-[radial-gradient(circle_at_center,rgba(130,60,255,0.06)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
+        {/* Subtle fiery red top accent */}
+        <div className="absolute top-[-5%] right-[20%] w-[40%] h-[40%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,50,0,0.08)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
       </motion.div>
 
       {/* Code Brain Canvas — centerpiece */}
@@ -171,6 +171,7 @@ export const Hero = () => {
 
         <div ref={ctaRef} style={{ opacity: 0 }}>
           <button
+            onClick={() => window.location.href = '/app'}
             className="magnetic-btn cta-breathe group relative px-8 py-4 bg-[#FF6A00] text-white text-lg font-medium rounded-full hover:bg-[hsl(24,100%,55%)] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,106,0,0.5)] hover:shadow-[0_0_60px_-15px_rgba(255,106,0,0.7)] hover:-translate-y-1 overflow-hidden"
             data-cursor-hover
           >

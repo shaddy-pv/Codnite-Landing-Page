@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Lenis from '@studio-freight/lenis';
 import Loader from '@/components/Loader';
 import CustomCursor from '@/components/CustomCursor';
-import SymbolParticles from '@/components/SymbolParticles';
 import { Hero } from '@/components/Hero';
 import { Navbar } from '@/components/Navbar';
-
-import { Problem } from '@/components/Problem';
-import { ProductReveal } from '@/components/ProductReveal';
-import { Features } from '@/components/Features';
-import { Experience } from '@/components/Experience';
-import { CTA } from '@/components/CTA';
-import { Footer } from '@/components/Footer';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Lazy load below-fold sections — these don't render until scrolled to
+const Problem = lazy(() => import('@/components/Problem'));
+const ProductReveal = lazy(() => import('@/components/ProductReveal'));
+const Features = lazy(() => import('@/components/Features'));
+const Experience = lazy(() => import('@/components/Experience'));
+const CTA = lazy(() => import('@/components/CTA'));
+const Footer = lazy(() => import('@/components/Footer'));
+const FeedbackButton = lazy(() => import('@/components/FeedbackButton'));
 
 const Index = () => {
   const [loadingComplete, setLoadingComplete] = useState(false);
@@ -47,20 +48,22 @@ const Index = () => {
     <div className="bg-[#0A0A0A] overflow-x-hidden relative selection:bg-orange-500/30 selection:text-orange-200">
       <CustomCursor />
 
-      {/* Symbol particles — fixed background layer */}
-      <SymbolParticles />
+      {/* SymbolParticles REMOVED — redundant with CodeBrain floaters, was a separate rAF loop */}
 
       {!loadingComplete && <Loader onComplete={() => setLoadingComplete(true)} />}
 
       <Navbar />
       <Hero />
 
-      <Problem />
-      <ProductReveal />
-      <Features />
-      <Experience />
-      <CTA />
-      <Footer />
+      <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A]" />}>
+        <Problem />
+        <ProductReveal />
+        <Features />
+        <Experience />
+        <CTA />
+        <Footer />
+        <FeedbackButton />
+      </Suspense>
     </div>
   );
 };

@@ -15,23 +15,24 @@ export const CustomCursor = () => {
   const trailRef = useRef<TrailPoint[]>([]);
   const isMobileRef = useRef(false);
   const animFrameRef = useRef<number>(0);
+  const dprRef = useRef(1);
 
   const updateTrail = useCallback(() => {
     const trail = trailRef.current;
     const pos = posRef.current;
     const target = targetRef.current;
 
-    // Smooth cursor movement (higher = more responsive)
+    // Smooth cursor movement
     pos.x += (target.x - pos.x) * 0.45;
     pos.y += (target.y - pos.y) * 0.45;
 
-    // Add to trail
-    trail.unshift({ x: pos.x, y: pos.y, alpha: 0.6 });
-    if (trail.length > 8) trail.pop();
+    // Add to trail — reduced from 8 to 5
+    trail.unshift({ x: pos.x, y: pos.y, alpha: 0.5 });
+    if (trail.length > 5) trail.pop();
 
     // Fade trail
     for (let i = 0; i < trail.length; i++) {
-      trail[i].alpha *= 0.85;
+      trail[i].alpha *= 0.8;
     }
 
     // Position the dot
@@ -45,17 +46,17 @@ export const CustomCursor = () => {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const dpr = dprRef.current;
 
         for (let i = 1; i < trail.length; i++) {
           const p = trail[i];
-          if (p.alpha < 0.02) continue;
-          const size = (4 - i * 0.3) * dpr;
+          if (p.alpha < 0.03) continue;
+          const size = (3.5 - i * 0.4) * dpr;
           if (size <= 0) continue;
 
           ctx.beginPath();
           ctx.arc(p.x * dpr, p.y * dpr, size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 106, 0, ${p.alpha})`;
+          ctx.fillStyle = `rgba(255,106,0,${p.alpha})`;
           ctx.fill();
         }
       }
@@ -70,22 +71,23 @@ export const CustomCursor = () => {
 
     // Setup canvas
     const canvas = canvasRef.current;
-    if (canvas) {
+    const setupCanvas = () => {
+      if (!canvas) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dprRef.current = dpr;
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
-    }
+    };
 
+    setupCanvas();
+
+    // Debounced resize
+    let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
-      if (canvas) {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = window.innerWidth * dpr;
-        canvas.height = window.innerHeight * dpr;
-        canvas.style.width = `${window.innerWidth}px`;
-        canvas.style.height = `${window.innerHeight}px`;
-      }
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(setupCanvas, 200);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -123,6 +125,7 @@ export const CustomCursor = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animFrameRef.current);
+      clearTimeout(resizeTimer);
     };
   }, [updateTrail]);
 

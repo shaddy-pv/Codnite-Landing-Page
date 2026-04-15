@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 
 export const Footer = () => {
   const links = [
-    { label: 'About', href: '#' },
-    { label: 'Features', href: '#' },
-    { label: 'Pricing', href: '#' },
-    { label: 'Contact', href: '#' }
+    { label: 'About', href: '#about' },
+    { label: 'Features', href: '#features' },
+    { label: 'Pricing', href: '/app' },
+    { label: 'Contact', href: 'mailto:shadanmd566@gmail.com' }
   ];
 
   return (

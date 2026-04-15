@@ -48,6 +48,7 @@ export const CTA = React.memo(() => {
           }}
         >
           <button
+            onClick={() => window.location.href = '/app'}
             className="magnetic-btn cta-breathe group relative px-12 py-5 bg-[#FF6A00] text-white text-xl font-medium rounded-full hover:bg-[hsl(24,100%,55%)] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,106,0,0.5)] hover:shadow-[0_0_60px_-15px_rgba(255,106,0,0.7)] hover:-translate-y-1 overflow-hidden"
             data-cursor-hover
           >

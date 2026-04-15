@@ -18,7 +18,7 @@ export const Experience = React.memo(() => {
             repeatType: "mirror",
             ease: "easeInOut"
           }}
-          className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.1)_0%,transparent_60%)] blur-[120px]" 
+          className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.1)_0%,transparent_60%)] blur-[80px]" 
         />
         <motion.div 
           animate={{
@@ -32,7 +32,7 @@ export const Experience = React.memo(() => {
             repeatType: "mirror",
             ease: "easeInOut"
           }}
-          className="absolute bottom-[-20%] right-[-20%] w-[100%] h-[100%] rounded-full bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.08)_0%,transparent_60%)] blur-[120px]" 
+          className="absolute bottom-[-20%] right-[-20%] w-[100%] h-[100%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,140,0,0.08)_0%,transparent_60%)] blur-[80px]" 
         />
       </div>
 

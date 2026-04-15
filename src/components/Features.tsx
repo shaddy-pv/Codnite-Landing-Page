@@ -47,32 +47,31 @@ export const Features = React.memo(() => {
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const cards = sectionRef.current.querySelectorAll('.feature-card');
-    
-    // Performance optimization: only animate when needed
-    gsap.set(cards, { opacity: 0, y: 40 });
+    const ctx = gsap.context(() => {
+      const cards = sectionRef.current!.querySelectorAll('.feature-card');
+      
+      gsap.set(cards, { opacity: 0, y: 40 });
 
-    ScrollTrigger.batch(cards, {
-      start: 'top 85%',
-      onEnter: batch => gsap.to(batch, {
-        opacity: 1, 
-        y: 0, 
-        stagger: 0.15, 
-        duration: 0.8,
-        ease: 'power2.out',
-        overwrite: true
-      }),
-      // Avoid re-triggering backwards unless intentional, but let's keep it clean
-      once: true
-    });
+      ScrollTrigger.batch(cards, {
+        start: 'top 85%',
+        onEnter: batch => gsap.to(batch, {
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.15, 
+          duration: 0.8,
+          ease: 'power2.out',
+          overwrite: true
+        }),
+        once: true
+      });
+    }, sectionRef);
 
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
+    return () => ctx.revert(); // Only kills triggers created in this context
   }, []);
 
   return (
     <section
+      id="features"
       ref={sectionRef}
       className="min-h-screen bg-[#0A0A0A] px-6 py-32 relative flex items-center justify-center overflow-hidden"
     >

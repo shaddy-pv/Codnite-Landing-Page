@@ -31,8 +31,8 @@ function isInBrain(nx: number, ny: number): boolean {
 // Check if point is on the outer edge of the brain shape
 function isOuterEdge(nx: number, ny: number): boolean {
   if (!isInBrain(nx, ny)) return false;
-  const step = 0.018;
-  const dirs = [[1,0],[-1,0],[0,1],[0,-1],[0.7,0.7],[-0.7,-0.7],[0.7,-0.7],[-0.7,0.7]];
+  const step = 0.022; // slightly larger step for fewer checks
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]]; // reduced from 8 to 4 directions
   for (const [dx, dy] of dirs) {
     if (!isInBrain(nx + dx * step, ny + dy * step)) return true;
   }
@@ -67,7 +67,7 @@ function catmullRom(p0: number[], p1: number[], p2: number[], p3: number[], t: n
   ];
 }
 
-function smoothPath(pts: number[][], density = 25): number[][] {
+function smoothPath(pts: number[][], density = 12): number[][] {
   if (pts.length < 2) return pts;
   const pad = [pts[0], ...pts, pts[pts.length - 1]];
   const out: number[][] = [];
@@ -87,11 +87,14 @@ interface BrainSym {
   symbol: string; size: number;
   baseAlpha: number; color: string;
   phase: number; isEdge: boolean;
+  fontStr: string; // Pre-computed font string
 }
 
 interface Signal {
   pathIdx: number; progress: number; speed: number;
   symbol: string; size: number; color: string;
+  fontStr: string;
+  glowFontStr: string;
 }
 
 interface FloatSym {
@@ -99,11 +102,19 @@ interface FloatSym {
   vx: number; vy: number;
   symbol: string; size: number;
   alpha: number; phase: number;
+  fontStr: string;
 }
 
 interface Wave {
   cx: number; cy: number;
   radius: number; maxR: number; speed: number;
+}
+
+const FNT_SUFFIX = "px 'Courier New',monospace";
+
+// Pre-build font string to avoid per-frame string concat
+function makeFontStr(size: number): string {
+  return `${Math.round(size)}${FNT_SUFFIX}`;
 }
 
 // ─── Component ───
@@ -112,6 +123,7 @@ export const CodeBrain = () => {
   const tRef = useRef(0);
   const animRef = useRef(0);
   const mouseRef = useRef({ x: -9999, y: -9999 });
+  const visibleRef = useRef(true);
 
   const symsRef = useRef<BrainSym[]>([]);
   const sigsRef = useRef<Signal[]>([]);
@@ -133,7 +145,7 @@ export const CodeBrain = () => {
   // ─── Initialize Everything ───
   const init = useCallback((w: number, h: number) => {
     const syms: BrainSym[] = [];
-    const GRID = 13; // pixels between symbols
+    const GRID = 22; // ← was 13, now significantly sparser to reduce draw calls
 
     // Scan screen grid, fill brain shape with symbols
     for (let sy = 0; sy < h; sy += GRID) {
@@ -149,42 +161,35 @@ export const CodeBrain = () => {
         let size: number;
 
         if (edge) {
-          // Edge — PROMINENT brain outline
-          baseAlpha = 0.55 + fold * 0.35; // 0.55 – 0.90
-          size = 8 + Math.random() * 4;
+          baseAlpha = 0.55 + fold * 0.35;
+          size = 9 + Math.random() * 4;
         } else {
-          // Interior — dimmer fill with fold-based variation
-          // Calculate rough depth (distance to nearest ellipse edge)
           let minEllipseVal = Infinity;
           for (const e of BRAIN) {
             const val = ((nx - e.cx) / e.rx) ** 2 + ((ny - e.cy) / e.ry) ** 2;
             if (val < minEllipseVal) minEllipseVal = val;
           }
-          const depth = 1 - minEllipseVal; // 0 = near edge, higher = deeper
+          const depth = 1 - minEllipseVal;
 
           if (depth < 0.25) {
-            // Near-edge interior
             baseAlpha = 0.10 + fold * 0.15;
-            size = 6 + Math.random() * 3;
+            size = 7 + Math.random() * 3;
           } else {
-            // Deep interior
             baseAlpha = 0.03 + fold * 0.08;
-            size = 5 + Math.random() * 3;
+            size = 6 + Math.random() * 3;
           }
         }
 
-        // Small random offset for organic feel
         const ox = (Math.random() - 0.5) * 4;
         const oy = (Math.random() - 0.5) * 4;
 
-        // Color: Codnite orange/amber/gold palette
         const cr = Math.random();
         let color: string;
-        if (cr < 0.40) color = '255, 106, 0';       // Codnite orange
-        else if (cr < 0.65) color = '255, 150, 30';  // warm amber
-        else if (cr < 0.80) color = '255, 190, 60';  // gold
-        else if (cr < 0.92) color = '255, 220, 140'; // bright gold-white
-        else color = '160, 90, 255';                  // purple accent
+        if (cr < 0.40) color = '255,106,0';
+        else if (cr < 0.65) color = '255,150,30';
+        else if (cr < 0.80) color = '255,190,60';
+        else if (cr < 0.92) color = '255,220,140';
+        else color = '255,200,80';
 
         syms.push({
           homeX: sx + ox, homeY: sy + oy,
@@ -194,105 +199,115 @@ export const CodeBrain = () => {
           size, baseAlpha, color,
           phase: Math.random() * Math.PI * 2,
           isEdge: edge,
+          fontStr: makeFontStr(size),
         });
       }
     }
+
     // Place dense symbols along each ellipse perimeter (brain outline)
     const scaleVal = Math.min(w, h) * 1.15;
     for (const e of BRAIN) {
       const [ecx, ecy] = toScreen(e.cx, e.cy, w, h);
       const erx = e.rx * scaleVal;
       const ery = e.ry * scaleVal;
-      // Approximate circumference, place symbol every ~6px
       const circumference = Math.PI * 2 * Math.sqrt((erx * erx + ery * ery) / 2);
-      const count = Math.floor(circumference / 6);
+      const count = Math.floor(circumference / 14); // ← was 6, now sparser
+
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2;
         const px = ecx + Math.cos(angle) * erx + (Math.random() - 0.5) * 6;
         const py = ecy + Math.sin(angle) * ery + (Math.random() - 0.5) * 6;
 
-        // Skip if this outline point is deep inside another ellipse (internal boundary)
         const [nnx, nny] = fromScreen(px, py, w, h);
         let insideCount = 0;
         for (const e2 of BRAIN) {
           const v = ((nnx - e2.cx) / e2.rx) ** 2 + ((nny - e2.cy) / e2.ry) ** 2;
           if (v < 0.75) insideCount++;
         }
-        if (insideCount > 1) continue; // skip internal boundaries
+        if (insideCount > 1) continue;
 
         const cr2 = Math.random();
-        const col = cr2 < 0.4 ? '255, 106, 0' : cr2 < 0.7 ? '255, 150, 30' : '255, 200, 70';
+        const col = cr2 < 0.4 ? '255,106,0' : cr2 < 0.7 ? '255,150,30' : '255,200,70';
+        const sz = 9 + Math.random() * 4;
         syms.push({
           homeX: px, homeY: py,
           x: px, y: py,
           vx: 0, vy: 0,
           symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-          size: 8 + Math.random() * 4,
-          baseAlpha: 0.50 + Math.random() * 0.40, // 0.50 – 0.90
+          size: sz,
+          baseAlpha: 0.50 + Math.random() * 0.40,
           color: col,
           phase: Math.random() * Math.PI * 2,
           isEdge: true,
+          fontStr: makeFontStr(sz),
         });
       }
     }
 
     // Pathway curves → screen coords
     const pathScreens = PATHWAYS.map(p =>
-      smoothPath(p, 25).map(pt => toScreen(pt[0], pt[1], w, h))
+      smoothPath(p, 12).map(pt => toScreen(pt[0], pt[1], w, h))
     );
     pathScreensRef.current = pathScreens;
 
     // Place symbols along pathway curves (nerve fibers)
     for (const pathPts of pathScreens) {
-      for (let i = 0; i < pathPts.length; i += 3) {
+      for (let i = 0; i < pathPts.length; i += 5) { // ← was 3, now sparser
         const pt = pathPts[Math.min(i, pathPts.length - 1)];
         const ox = (Math.random() - 0.5) * 5;
         const oy = (Math.random() - 0.5) * 5;
         const cr3 = Math.random();
-        const col = cr3 < 0.4 ? '255, 106, 0' : cr3 < 0.7 ? '255, 160, 40' : '255, 210, 80';
+        const col = cr3 < 0.4 ? '255,106,0' : cr3 < 0.7 ? '255,160,40' : '255,210,80';
+        const sz = 7 + Math.random() * 3;
         syms.push({
           homeX: pt[0] + ox, homeY: pt[1] + oy,
           x: pt[0] + ox, y: pt[1] + oy,
           vx: 0, vy: 0,
           symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-          size: 7 + Math.random() * 3,
-          baseAlpha: 0.30 + Math.random() * 0.30, // 0.30 – 0.60
+          size: sz,
+          baseAlpha: 0.30 + Math.random() * 0.30,
           color: col,
           phase: Math.random() * Math.PI * 2,
           isEdge: false,
+          fontStr: makeFontStr(sz),
         });
       }
     }
 
     symsRef.current = syms;
 
-    // Signal particles traveling along pathways
+    // Signal particles — reduced from 4 to 2 per path
     const sigs: Signal[] = [];
     for (let i = 0; i < pathScreens.length; i++) {
-      for (let j = 0; j < 4; j++) {
+      for (let j = 0; j < 2; j++) {
+        const sz = 10 + Math.random() * 4;
         sigs.push({
           pathIdx: i,
           progress: Math.random(),
           speed: 0.002 + Math.random() * 0.004,
           symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-          size: 10 + Math.random() * 4,
-          color: Math.random() > 0.35 ? '255, 210, 80' : '255, 255, 220',
+          size: sz,
+          color: Math.random() > 0.35 ? '255,210,80' : '255,255,220',
+          fontStr: makeFontStr(sz),
+          glowFontStr: makeFontStr(sz + 8),
         });
       }
     }
     sigsRef.current = sigs;
 
-    // Ambient floaters
+    // Ambient floaters — reduced from 40 to 15
     const floats: FloatSym[] = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 15; i++) {
+      const sz = 10 + Math.random() * 12;
       floats.push({
         x: Math.random() * w, y: Math.random() * h,
         vx: (Math.random() - 0.5) * 0.25,
         vy: -0.08 - Math.random() * 0.15,
         symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-        size: 10 + Math.random() * 12,
+        size: sz,
         alpha: 0.015 + Math.random() * 0.035,
         phase: Math.random() * Math.PI * 2,
+        fontStr: makeFontStr(sz),
       });
     }
     floatsRef.current = floats;
@@ -310,12 +325,20 @@ export const CodeBrain = () => {
 
     let cw = 0, ch = 0;
 
+    // ─── Visibility observer: pause rendering when off-screen ───
+    const observer = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0.05 }
+    );
+    const parent = canvas.parentElement;
+    if (parent) observer.observe(parent);
+
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      cw = parent.clientWidth;
-      ch = parent.clientHeight;
+      const parentEl = canvas.parentElement;
+      if (!parentEl) return;
+      cw = parentEl.clientWidth;
+      ch = parentEl.clientHeight;
       canvas.width = cw * dpr;
       canvas.height = ch * dpr;
       canvas.style.width = `${cw}px`;
@@ -335,11 +358,21 @@ export const CodeBrain = () => {
     canvas.addEventListener('mousemove', onMouse);
     canvas.addEventListener('mouseleave', onLeave);
 
-    const fnt = "px 'Courier New', monospace";
-
     // ─── Main Render Loop ───
+    let lastFont = '';
+
+    const setFont = (f: string) => {
+      if (f !== lastFont) {
+        ctx.font = f;
+        lastFont = f;
+      }
+    };
+
     const animate = () => {
-      if (!cw || !ch) { animRef.current = requestAnimationFrame(animate); return; }
+      animRef.current = requestAnimationFrame(animate);
+
+      // Skip rendering when off-screen
+      if (!visibleRef.current || !cw || !ch) return;
 
       const dt = 0.016;
       tRef.current += dt;
@@ -357,29 +390,29 @@ export const CodeBrain = () => {
       // ── 1. Background radial glow ──
       const bgP = 0.6 + Math.sin(t * 0.7) * 0.4;
       const bgG = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainR * 1.2);
-      bgG.addColorStop(0, `rgba(255, 70, 0, ${0.07 * bgP})`);
-      bgG.addColorStop(0.35, `rgba(200, 50, 0, ${0.03 * bgP})`);
-      bgG.addColorStop(0.65, `rgba(80, 20, 100, ${0.015 * bgP})`);
+      bgG.addColorStop(0, `rgba(255,70,0,${0.07 * bgP})`);
+      bgG.addColorStop(0.35, `rgba(200,50,0,${0.03 * bgP})`);
+      bgG.addColorStop(0.65, `rgba(255,100,0,${0.015 * bgP})`);
       bgG.addColorStop(1, 'transparent');
       ctx.fillStyle = bgG;
       ctx.fillRect(0, 0, cw, ch);
 
       // ── 2. Neural network halo rings ──
+      ctx.setLineDash([3, 8]);
+      ctx.lineWidth = 0.7;
       for (let r = 0; r < 3; r++) {
         const rad = brainR * (0.95 + r * 0.15);
         const rA = (0.045 - r * 0.013) * (0.5 + Math.sin(t * 0.5 + r * 1.1) * 0.5);
         ctx.beginPath();
         ctx.arc(brainCx, brainCy, rad, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 106, 0, ${rA})`;
-        ctx.lineWidth = 0.7;
-        ctx.setLineDash([3, 8]);
+        ctx.strokeStyle = `rgba(255,106,0,${rA})`;
         ctx.stroke();
-        ctx.setLineDash([]);
       }
+      ctx.setLineDash([]);
 
-      // ── 4. Glow waves ──
+      // ── 4. Glow waves — max 2 active ──
       wTimerRef.current += dt;
-      if (wTimerRef.current > 2.0) {
+      if (wTimerRef.current > 2.5 && wavesRef.current.length < 2) {
         wTimerRef.current = 0;
         wavesRef.current.push({
           cx: brainCx + (Math.random() - 0.5) * brainR * 0.4,
@@ -395,10 +428,10 @@ export const CodeBrain = () => {
         const wA = 0.3 * (1 - w.radius / w.maxR);
         ctx.beginPath();
         ctx.arc(w.cx, w.cy, w.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 150, 30, ${wA * 0.05})`;
-        ctx.lineWidth = 35;
+        ctx.strokeStyle = `rgba(255,150,30,${wA * 0.05})`;
+        ctx.lineWidth = 15; // ← was 35
         ctx.stroke();
-        ctx.strokeStyle = `rgba(255, 106, 0, ${wA * 0.18})`;
+        ctx.strokeStyle = `rgba(255,106,0,${wA * 0.18})`;
         ctx.lineWidth = 1.5;
         ctx.stroke();
       }
@@ -414,23 +447,28 @@ export const CodeBrain = () => {
         if (f.y > ch + 50) f.y = -50;
         const fa = f.alpha + Math.sin(t + f.phase) * 0.008;
         if (fa <= 0) continue;
-        ctx.font = `${f.size}${fnt}`;
-        ctx.fillStyle = `rgba(255, 106, 0, ${fa})`;
+        setFont(f.fontStr);
+        ctx.fillStyle = `rgba(255,106,0,${fa})`;
         ctx.fillText(f.symbol, f.x, f.y);
       }
 
       // ── 6. BRAIN SYMBOLS — the main visual ──
-      const REP_R = 140;   // repulsion radius
-      const REP_F = 11;    // repulsion force
-      const SPR = 0.05;    // spring constant
-      const DMP = 0.85;    // damping
+      const REP_R = 140;
+      const REP_F = 11;
+      const SPR = 0.05;
+      const DMP = 0.85;
+      const waves = wavesRef.current;
+      const waveLen = waves.length;
 
       for (const s of symsRef.current) {
         // Mouse repulsion
         const dx = s.x - mouse.x;
         const dy = s.y - mouse.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < REP_R && d > 1) {
+        const d2 = dx * dx + dy * dy;
+        const REP_R2 = REP_R * REP_R;
+
+        if (d2 < REP_R2 && d2 > 1) {
+          const d = Math.sqrt(d2);
           const f = (1 - d / REP_R) * REP_F;
           s.vx += (dx / d) * f;
           s.vy += (dy / d) * f;
@@ -451,41 +489,48 @@ export const CodeBrain = () => {
 
         let alpha = s.baseAlpha * pulse;
 
-        // Wave boost
-        for (const wave of wavesRef.current) {
-          const wd = Math.sqrt((s.x - wave.cx) ** 2 + (s.y - wave.cy) ** 2);
-          if (Math.abs(wd - wave.radius) < 50) {
-            const cl = 1 - Math.abs(wd - wave.radius) / 50;
-            alpha += cl * (1 - wave.radius / wave.maxR) * 0.55;
+        // Wave boost — only check if waves exist
+        if (waveLen > 0) {
+          for (let wi = 0; wi < waveLen; wi++) {
+            const wave = waves[wi];
+            const wd = Math.sqrt((s.x - wave.cx) ** 2 + (s.y - wave.cy) ** 2);
+            const diff = Math.abs(wd - wave.radius);
+            if (diff < 50) {
+              alpha += (1 - diff / 50) * (1 - wave.radius / wave.maxR) * 0.55;
+            }
           }
         }
 
         // Mouse proximity glow
-        if (d < REP_R * 1.3 && d > 0) {
-          alpha += (1 - d / (REP_R * 1.3)) * 0.35;
+        const REP_R_GLOW = REP_R * 1.3;
+        if (d2 < REP_R_GLOW * REP_R_GLOW && d2 > 0) {
+          const d = Math.sqrt(d2);
+          alpha += (1 - d / REP_R_GLOW) * 0.35;
         }
 
-        // Displacement glow (brighter when pushed)
-        const disp = Math.sqrt((s.homeX - s.x) ** 2 + (s.homeY - s.y) ** 2);
+        // Displacement glow
+        const dispX = s.homeX - s.x;
+        const dispY = s.homeY - s.y;
+        const disp = Math.sqrt(dispX * dispX + dispY * dispY);
         alpha += Math.min(disp / 30, 0.5);
 
         alpha = Math.min(alpha, 1);
-        if (alpha < 0.012) continue;
+        if (alpha < 0.03) continue; // ← was 0.012, skip dim symbols earlier
 
         // Draw symbol
-        ctx.font = `${s.size}${fnt}`;
-        ctx.fillStyle = `rgba(${s.color}, ${alpha})`;
+        setFont(s.fontStr);
+        ctx.fillStyle = `rgba(${s.color},${alpha})`;
         ctx.fillText(s.symbol, s.x, s.y);
 
         // Extra glow halo for bright edge particles
-        if (s.isEdge && alpha > 0.3) {
-          ctx.fillStyle = `rgba(${s.color}, ${alpha * 0.06})`;
-          ctx.font = `${s.size + 6}${fnt}`;
+        if (s.isEdge && alpha > 0.4) { // ← was 0.3
+          ctx.fillStyle = `rgba(${s.color},${alpha * 0.06})`;
+          // Skip separate font set for glow — just use same font for slight visual simplification
           ctx.fillText(s.symbol, s.x, s.y);
         }
       }
 
-      // ── 7. Signal particles (bright flowing symbols on pathways) ──
+      // ── 7. Signal particles ──
       for (const sig of sigsRef.current) {
         sig.progress += sig.speed;
         if (sig.progress > 1) sig.progress -= 1;
@@ -504,25 +549,25 @@ export const CodeBrain = () => {
         const sA = 0.5 + 0.5 * Math.sin(t * 10 + sig.progress * 40);
 
         // Glow halo
-        ctx.fillStyle = `rgba(${sig.color}, ${sA * 0.12})`;
-        ctx.font = `${sig.size + 8}${fnt}`;
+        ctx.fillStyle = `rgba(${sig.color},${sA * 0.12})`;
+        setFont(sig.glowFontStr);
         ctx.fillText(sig.symbol, x, y);
 
         // Core
-        ctx.fillStyle = `rgba(${sig.color}, ${sA * 0.85})`;
-        ctx.font = `${sig.size}${fnt}`;
+        ctx.fillStyle = `rgba(${sig.color},${sA * 0.85})`;
+        setFont(sig.fontStr);
         ctx.fillText(sig.symbol, x, y);
 
         // White hot center
-        ctx.fillStyle = `rgba(255, 255, 255, ${sA * 0.5})`;
+        ctx.fillStyle = `rgba(255,255,255,${sA * 0.5})`;
         ctx.fillRect(x - 1, y - 1, 2, 2);
       }
 
       // ── 8. Mouse flashlight ──
       if (mouse.x > 0 && mouse.x < cw && mouse.y > 0 && mouse.y < ch) {
         const mg = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 160);
-        mg.addColorStop(0, 'rgba(255, 110, 20, 0.04)');
-        mg.addColorStop(0.5, 'rgba(255, 70, 0, 0.012)');
+        mg.addColorStop(0, 'rgba(255,110,20,0.04)');
+        mg.addColorStop(0.5, 'rgba(255,70,0,0.012)');
         mg.addColorStop(1, 'transparent');
         ctx.fillStyle = mg;
         ctx.fillRect(mouse.x - 160, mouse.y - 160, 320, 320);
@@ -531,13 +576,11 @@ export const CodeBrain = () => {
       // ── 9. Central bloom ──
       const bP = 0.45 + Math.sin(t * 0.8) * 0.55;
       const bl = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainR * 0.4);
-      bl.addColorStop(0, `rgba(255, 106, 0, ${0.025 * bP})`);
-      bl.addColorStop(0.5, `rgba(255, 130, 30, ${0.01 * bP})`);
+      bl.addColorStop(0, `rgba(255,106,0,${0.025 * bP})`);
+      bl.addColorStop(0.5, `rgba(255,130,30,${0.01 * bP})`);
       bl.addColorStop(1, 'transparent');
       ctx.fillStyle = bl;
       ctx.fillRect(0, 0, cw, ch);
-
-      animRef.current = requestAnimationFrame(animate);
     };
 
     animRef.current = requestAnimationFrame(animate);
@@ -547,6 +590,7 @@ export const CodeBrain = () => {
       window.removeEventListener('resize', resize);
       canvas.removeEventListener('mousemove', onMouse);
       canvas.removeEventListener('mouseleave', onLeave);
+      observer.disconnect();
     };
   }, [init, toScreen]);
 
