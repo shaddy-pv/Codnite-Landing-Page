@@ -6,7 +6,7 @@ import path from "path";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 4173, // Internal port — main app at 5173 proxies landing page from here
   },
   plugins: [react()],
   resolve: {
