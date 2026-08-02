@@ -1,14 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/app",
-      "destination": "https://codnite.vercel.app"
-    },
-    {
-      "source": "/app/(.*)",
-      "destination": "https://codnite.vercel.app/$1"
-    }
-  ],
   "redirects": [
     {
       "source": "/(.*)",
@@ -20,6 +10,17 @@
       ],
       "destination": "https://codnite.com/$1",
       "permanent": true
+    },
+    {
+      "source": "/app",
+      "destination": "https://codnite.com/app/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/app/(.*)",
+      "destination": "https://codnite.vercel.app/app/$1"
     }
   ]
 }

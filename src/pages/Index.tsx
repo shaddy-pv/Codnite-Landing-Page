@@ -2,7 +2,7 @@ import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Lenis from '@studio-freight/lenis';
 import Loader from '@/components/Loader';
 import CustomCursor from '@/components/CustomCursor';
-import { Hero } from '@/components/Hero';
+import HeroSection from '@/components/HeroSection';
 import { Navbar } from '@/components/Navbar';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -52,7 +52,7 @@ const Index = () => {
       {!loadingComplete && <Loader onComplete={() => setLoadingComplete(true)} />}
 
       <Navbar />
-      <Hero />
+      <HeroSection />
 
       <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A]" />}>
         <StarryBackground />

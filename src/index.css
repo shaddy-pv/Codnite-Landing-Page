@@ -243,3 +243,25 @@
     cursor: auto !important;
   }
 }
+
+/* === Hero Animations === */
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.animate-hero-float {
+  animation: hero-float var(--float-duration, 6s) ease-in-out
+    var(--float-delay, 0s) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-float {
+    animation: none;
+  }
+}

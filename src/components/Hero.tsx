@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { gsap } from 'gsap';
-import { CodeBrain } from './CodeBrain';
+
 
 export const Hero = () => {
   const containerRef = useRef<HTMLElement>(null);
@@ -17,7 +17,6 @@ export const Hero = () => {
     offset: ["start start", "end start"]
   });
 
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const yText = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   // GSAP text reveal animations
@@ -93,34 +92,10 @@ export const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen w-full overflow-hidden flex items-center justify-center"
-      style={{
-        background: 'linear-gradient(180deg, #0A0A0A 0%, #0D0500 40%, #0A0A0A 100%)',
-      }}
+      className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-[#050505]"
     >
-      <div className="absolute inset-0 bg-noise pointer-events-none z-0" />
 
-      {/* Background Parallax Layer — cinematic gradients */}
-      <motion.div
-        style={{ y: yBg }}
-        className="absolute inset-0 z-[1] pointer-events-none"
-      >
-        {/* Orange top-left glow */}
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.12)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
-        {/* Deep amber bottom-right glow */}
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,140,0,0.08)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
-        {/* Center ambient glow */}
-        <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.05)_0%,transparent_60%)] blur-3xl mix-blend-screen" />
-        {/* Subtle fiery red top accent */}
-        <div className="absolute top-[-5%] right-[20%] w-[40%] h-[40%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,50,0,0.08)_0%,transparent_70%)] blur-3xl mix-blend-screen" />
-      </motion.div>
-
-      {/* Code Brain Canvas — centerpiece */}
-      <div className="absolute inset-0 z-[2]">
-        <CodeBrain />
-      </div>
-
-      {/* Foreground Text Layer — pointer-events-none so mouse passes to brain canvas */}
+      {/* Foreground Text Layer */}
       <motion.div
         style={{ y: yText }}
         className="relative z-10 text-center px-6 max-w-5xl pointer-events-none"
@@ -183,29 +158,6 @@ export const Hero = () => {
             <div className="absolute inset-0 rounded-full border border-white/20 edge-highlight pointer-events-none" />
           </button>
           <span className="text-gray-600 text-xs font-medium tracking-widest uppercase">Free to join • No credit card</span>
-        </div>
-      </motion.div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-[30px] h-[50px] border-[1.5px] border-gray-600/50 rounded-full flex justify-center p-[6px]">
-          <motion.div
-            animate={{
-              y: [0, 16, 0],
-              opacity: [0.5, 1, 0.5]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="w-1.5 h-1.5 bg-[#FF6A00]/80 rounded-full"
-          />
         </div>
       </motion.div>
     </section>

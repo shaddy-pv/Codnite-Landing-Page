@@ -1,98 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
+import brainImgUrl from '@/assets/brain.png';
 
 // ─── Programming Syntax Symbols ───
 const SYNTAX = [
   '<', '>', '{', '}', '(', ')', '[', ']', ';', ':', '"', "'",
   '/', '\\', '|', '+', '-', '*', '&', '^', '%', '$', '#',
   '@', '!', '~', '=>', '&&', '||', '==', '::', '//',
-];
-
-// ─── Anatomically Accurate Brain Shape ───
-// Side-profile brain built from 22 overlapping ellipses
-// Each lobe is separately defined for a recognizable silhouette
-const BRAIN = [
-  // ── Frontal Lobe (front-left, large rounded prominence) ──
-  { cx: 0.25, cy: 0.38, rx: 0.15, ry: 0.20 },
-  { cx: 0.20, cy: 0.32, rx: 0.10, ry: 0.14 },
-  { cx: 0.28, cy: 0.28, rx: 0.11, ry: 0.10 },
-  { cx: 0.18, cy: 0.42, rx: 0.08, ry: 0.12 },
-
-  // ── Parietal Lobe (top-center, the dome) ──
-  { cx: 0.40, cy: 0.24, rx: 0.14, ry: 0.10 },
-  { cx: 0.50, cy: 0.22, rx: 0.12, ry: 0.09 },
-  { cx: 0.35, cy: 0.30, rx: 0.13, ry: 0.11 },
-
-  // ── Main Cerebrum (large central mass connecting everything) ──
-  { cx: 0.42, cy: 0.38, rx: 0.28, ry: 0.22 },
-  { cx: 0.45, cy: 0.32, rx: 0.22, ry: 0.18 },
-
-  // ── Occipital Lobe (back of the head) ──
-  { cx: 0.66, cy: 0.32, rx: 0.10, ry: 0.14 },
-  { cx: 0.70, cy: 0.38, rx: 0.09, ry: 0.13 },
-  { cx: 0.68, cy: 0.28, rx: 0.08, ry: 0.10 },
-
-  // ── Temporal Lobe (lower-front side) ──
-  { cx: 0.32, cy: 0.52, rx: 0.14, ry: 0.08 },
-  { cx: 0.26, cy: 0.50, rx: 0.10, ry: 0.07 },
-  { cx: 0.40, cy: 0.50, rx: 0.12, ry: 0.07 },
-
-  // ── Cerebellum (smaller, textured, lower-back) ──
-  { cx: 0.64, cy: 0.54, rx: 0.09, ry: 0.06 },
-  { cx: 0.68, cy: 0.52, rx: 0.07, ry: 0.05 },
-  { cx: 0.60, cy: 0.56, rx: 0.07, ry: 0.05 },
-  { cx: 0.66, cy: 0.58, rx: 0.06, ry: 0.04 },
-
-  // ── Brainstem (narrow, extends downward) ──
-  { cx: 0.56, cy: 0.62, rx: 0.04, ry: 0.07 },
-  { cx: 0.55, cy: 0.70, rx: 0.03, ry: 0.06 },
-  { cx: 0.54, cy: 0.76, rx: 0.025, ry: 0.05 },
-];
-
-// Check if a normalized point is inside the brain
-function isInBrain(nx: number, ny: number): boolean {
-  for (const e of BRAIN) {
-    const val = ((nx - e.cx) / e.rx) ** 2 + ((ny - e.cy) / e.ry) ** 2;
-    if (val < 1) return true;
-  }
-  return false;
-}
-
-// Check if point is on the outer edge of the brain shape
-function isOuterEdge(nx: number, ny: number): boolean {
-  if (!isInBrain(nx, ny)) return false;
-  const step = 0.018;
-  const dirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]];
-  for (const [dx, dy] of dirs) {
-    if (!isInBrain(nx + dx * step, ny + dy * step)) return true;
-  }
-  return false;
-}
-
-// Organic fold texture pattern (simulates gyri/sulci)
-function foldValue(nx: number, ny: number): number {
-  const f1 = Math.sin(nx * 35 + Math.sin(ny * 15) * 3.0);
-  const f2 = Math.sin(ny * 25 + Math.sin(nx * 10) * 2.5);
-  return (f1 * f2 + 1) * 0.5;
-}
-
-// ─── Neural Pathway Curves ───
-const PATHWAYS = [
-  // Frontal → Parietal
-  [[0.22, 0.36], [0.30, 0.30], [0.40, 0.26], [0.50, 0.24], [0.60, 0.28]],
-  // Frontal → Temporal
-  [[0.22, 0.40], [0.28, 0.46], [0.34, 0.50], [0.40, 0.50]],
-  // Parietal → Occipital
-  [[0.50, 0.24], [0.58, 0.26], [0.64, 0.30], [0.68, 0.36]],
-  // Central pathway
-  [[0.30, 0.36], [0.42, 0.36], [0.54, 0.36], [0.64, 0.38]],
-  // Temporal → lower
-  [[0.30, 0.50], [0.40, 0.50], [0.50, 0.52], [0.58, 0.54]],
-  // Vertical: frontal → temporal
-  [[0.26, 0.30], [0.28, 0.38], [0.30, 0.46], [0.32, 0.52]],
-  // Cerebellum connections
-  [[0.60, 0.44], [0.62, 0.50], [0.64, 0.54]],
-  // Brainstem pathway
-  [[0.52, 0.50], [0.54, 0.58], [0.55, 0.66], [0.55, 0.74]],
 ];
 
 // Catmull-Rom spline
@@ -125,6 +38,7 @@ interface BrainSym {
   baseAlpha: number; color: string;
   phase: number; isEdge: boolean;
   fontStr: string;
+  brightness: number;
 }
 
 interface Signal {
@@ -153,9 +67,9 @@ function makeFontStr(size: number): string {
   return `${Math.round(size)}${FNT_SUFFIX}`;
 }
 
-// ─── Component ───
 export const CodeBrain = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const tRef = useRef(0);
   const animRef = useRef(0);
   const mouseRef = useRef({ x: -9999, y: -9999 });
@@ -167,181 +81,181 @@ export const CodeBrain = () => {
   const wavesRef = useRef<Wave[]>([]);
   const wTimerRef = useRef(0);
   const pathScreensRef = useRef<number[][][]>([]);
+  const cwRef = useRef(0);
+  const chRef = useRef(0);
 
-  const toScreen = useCallback((nx: number, ny: number, w: number, h: number) => {
-    const scale = Math.min(w, h) * 1.15;
-    return [w * 0.50 + (nx - 0.5) * scale, h * 0.50 + (ny - 0.5) * scale];
-  }, []);
-
-  const fromScreen = useCallback((sx: number, sy: number, w: number, h: number) => {
-    const scale = Math.min(w, h) * 1.15;
-    return [(sx - w * 0.50) / scale + 0.5, (sy - h * 0.50) / scale + 0.5];
+  // Load image once
+  useEffect(() => {
+    const img = new Image();
+    img.src = brainImgUrl;
+    img.onload = () => {
+      imgRef.current = img;
+      // Re-initialize once the image is loaded
+      window.dispatchEvent(new Event('resize'));
+    };
   }, []);
 
   // ─── Initialize Everything ───
   const init = useCallback((w: number, h: number) => {
-    const syms: BrainSym[] = [];
-    const GRID = 18; // Denser grid for clearer brain definition
+    if (!imgRef.current) return;
+    const img = imgRef.current;
 
-    // Scan screen grid, fill brain shape with symbols
-    for (let sy = 0; sy < h; sy += GRID) {
-      for (let sx = 0; sx < w; sx += GRID) {
-        const [nx, ny] = fromScreen(sx, sy, w, h);
-        if (!isInBrain(nx, ny)) continue;
+    cwRef.current = w;
+    chRef.current = h;
 
-        const edge = isOuterEdge(nx, ny);
-        const fold = foldValue(nx, ny);
-
-        let baseAlpha: number;
-        let size: number;
-
-        if (edge) {
-          // Edge symbols are brighter and larger for a crisp silhouette
-          baseAlpha = 0.60 + fold * 0.35;
-          size = 10 + Math.random() * 4;
-        } else {
-          let minEllipseVal = Infinity;
-          for (const e of BRAIN) {
-            const val = ((nx - e.cx) / e.rx) ** 2 + ((ny - e.cy) / e.ry) ** 2;
-            if (val < minEllipseVal) minEllipseVal = val;
-          }
-          const depth = 1 - minEllipseVal;
-
-          if (depth < 0.25) {
-            baseAlpha = 0.12 + fold * 0.18;
-            size = 7 + Math.random() * 3;
-          } else {
-            baseAlpha = 0.04 + fold * 0.10;
-            size = 6 + Math.random() * 3;
-          }
-        }
-
-        const ox = (Math.random() - 0.5) * 3;
-        const oy = (Math.random() - 0.5) * 3;
-
-        const cr = Math.random();
-        let color: string;
-        if (cr < 0.40) color = '255,106,0';
-        else if (cr < 0.65) color = '255,150,30';
-        else if (cr < 0.80) color = '255,190,60';
-        else if (cr < 0.92) color = '255,220,140';
-        else color = '255,200,80';
-
-        syms.push({
-          homeX: sx + ox, homeY: sy + oy,
-          x: sx + ox, y: sy + oy,
-          vx: 0, vy: 0,
-          symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-          size, baseAlpha, color,
-          phase: Math.random() * Math.PI * 2,
-          isEdge: edge,
-          fontStr: makeFontStr(size),
-        });
-      }
+    // Use offscreen canvas to extract image data
+    const targetSize = Math.min(w, h) * 0.85; // occupy 85% of smaller screen dimension
+    const aspect = img.width / img.height;
+    
+    let drawW = targetSize;
+    let drawH = targetSize / aspect;
+    if (drawH > targetSize) {
+      drawH = targetSize;
+      drawW = targetSize * aspect;
     }
 
-    // Place dense symbols along each ellipse perimeter (brain outline)
-    const scaleVal = Math.min(w, h) * 1.15;
-    for (const e of BRAIN) {
-      const [ecx, ecy] = toScreen(e.cx, e.cy, w, h);
-      const erx = e.rx * scaleVal;
-      const ery = e.ry * scaleVal;
-      const circumference = Math.PI * 2 * Math.sqrt((erx * erx + ery * ery) / 2);
-      const count = Math.floor(circumference / 10); // Dense edge for crisp outline
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = drawW;
+    offCanvas.height = drawH;
+    const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+    if (!offCtx) return;
 
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2;
-        const px = ecx + Math.cos(angle) * erx + (Math.random() - 0.5) * 4;
-        const py = ecy + Math.sin(angle) * ery + (Math.random() - 0.5) * 4;
+    offCtx.drawImage(img, 0, 0, drawW, drawH);
+    const imgData = offCtx.getImageData(0, 0, drawW, drawH);
+    const data = imgData.data;
 
-        const [nnx, nny] = fromScreen(px, py, w, h);
-        let insideCount = 0;
-        for (const e2 of BRAIN) {
-          const v = ((nnx - e2.cx) / e2.rx) ** 2 + ((nny - e2.cy) / e2.ry) ** 2;
-          if (v < 0.75) insideCount++;
-        }
-        if (insideCount > 2) continue; // Skip deeply internal perimeter points
+    const syms: BrainSym[] = [];
+    const GRID = 10; // Denser grid for clearer detailed definition
 
-        const cr2 = Math.random();
-        const col = cr2 < 0.4 ? '255,106,0' : cr2 < 0.7 ? '255,150,30' : '255,200,70';
-        const sz = 9 + Math.random() * 4;
+    const offsetX = (w - drawW) / 2;
+    const offsetY = (h - drawH) / 2;
+
+    // 1. Build the Brain Symbols based on image brightness
+    // Use a dense scan (step 2) to catch thin lines, but spawn probabilistically to maintain performance
+    for (let y = 0; y < drawH; y += 2) {
+      for (let x = 0; x < drawW; x += 2) {
+        const i = (y * drawW + x) * 4;
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a < 20) continue; // Skip transparent pixels
+
+        // Calculate brightness
+        const brightness = (r + g + b) / (3 * 255);
+        if (brightness < 0.08) continue; // Skip dark areas
+
+        // Probabilistic spawn: brighter pixels are more likely to spawn a symbol
+        // This ensures thin bright lines are captured, while dark areas don't overcrowd
+        const spawnChance = brightness * 0.35; 
+        if (Math.random() > spawnChance) continue;
+
+        const isEdge = brightness > 0.6;
+        
+        const baseAlpha = 0.2 + brightness * 0.8;
+        const size = 8 + brightness * 8;
+        
+        // Add some jitter for a more organic feel
+        const ox = (Math.random() - 0.5) * 4;
+        const oy = (Math.random() - 0.5) * 4;
+
+        const px = offsetX + x + ox;
+        const py = offsetY + y + oy;
+
+        // Determine color based on brightness to match the reference glowing effect
+        let color = '255,106,0'; 
+        if (brightness > 0.8) color = '255,230,160';
+        else if (brightness > 0.5) color = '255,180,50';
+        else if (brightness > 0.3) color = '255,130,20';
+
         syms.push({
           homeX: px, homeY: py,
           x: px, y: py,
           vx: 0, vy: 0,
           symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-          size: sz,
-          baseAlpha: 0.55 + Math.random() * 0.40,
-          color: col,
+          size, baseAlpha, color,
           phase: Math.random() * Math.PI * 2,
-          isEdge: true,
-          fontStr: makeFontStr(sz),
+          isEdge,
+          fontStr: makeFontStr(size),
+          brightness
         });
       }
     }
-
-    // Pathway curves → screen coords
-    const pathScreens = PATHWAYS.map(p =>
-      smoothPath(p, 12).map(pt => toScreen(pt[0], pt[1], w, h))
-    );
-    pathScreensRef.current = pathScreens;
-
-    // Place symbols along pathway curves (nerve fibers)
-    for (const pathPts of pathScreens) {
-      for (let i = 0; i < pathPts.length; i += 4) {
-        const pt = pathPts[Math.min(i, pathPts.length - 1)];
-        const ox = (Math.random() - 0.5) * 4;
-        const oy = (Math.random() - 0.5) * 4;
-        const cr3 = Math.random();
-        const col = cr3 < 0.4 ? '255,106,0' : cr3 < 0.7 ? '255,160,40' : '255,210,80';
-        const sz = 7 + Math.random() * 3;
-        syms.push({
-          homeX: pt[0] + ox, homeY: pt[1] + oy,
-          x: pt[0] + ox, y: pt[1] + oy,
-          vx: 0, vy: 0,
-          symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
-          size: sz,
-          baseAlpha: 0.30 + Math.random() * 0.30,
-          color: col,
-          phase: Math.random() * Math.PI * 2,
-          isEdge: false,
-          fontStr: makeFontStr(sz),
-        });
-      }
-    }
-
     symsRef.current = syms;
 
-    // Signal particles — 2 per path
+    // 2. Generate Neural Pathways dynamically across the brain
+    const paths: number[][][] = [];
+    const numPaths = 20; // Number of glowing lines
+    
+    for (let p = 0; p < numPaths; p++) {
+      if (syms.length === 0) break;
+      let current = syms[Math.floor(Math.random() * syms.length)];
+      const pathPts = [[current.homeX, current.homeY]];
+      
+      const steps = 4 + Math.floor(Math.random() * 4); // 4 to 7 steps per path
+      
+      for (let step = 0; step < steps; step++) {
+        let closest = null;
+        let minDist = Infinity;
+        
+        // Sample random nodes to find the next connection point
+        for (let i = 0; i < 40; i++) {
+          const candidate = syms[Math.floor(Math.random() * syms.length)];
+          const dx = candidate.homeX - current.homeX;
+          const dy = candidate.homeY - current.homeY;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          // Only connect if it's within a reasonable distance (not too short, not across the whole brain)
+          if (dist > 20 && dist < 120 && dist < minDist) {
+            minDist = dist;
+            closest = candidate;
+          }
+        }
+        
+        if (closest) {
+          pathPts.push([closest.homeX, closest.homeY]);
+          current = closest;
+        } else {
+          break;
+        }
+      }
+      
+      if (pathPts.length >= 3) {
+        paths.push(smoothPath(pathPts, 12));
+      }
+    }
+    pathScreensRef.current = paths;
+
+    // 3. Signal particles running along the paths
     const sigs: Signal[] = [];
-    for (let i = 0; i < pathScreens.length; i++) {
+    for (let i = 0; i < paths.length; i++) {
       for (let j = 0; j < 2; j++) {
-        const sz = 10 + Math.random() * 4;
+        const sz = 10 + Math.random() * 5;
         sigs.push({
           pathIdx: i,
           progress: Math.random(),
-          speed: 0.002 + Math.random() * 0.004,
+          speed: 0.001 + Math.random() * 0.003,
           symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
           size: sz,
-          color: Math.random() > 0.35 ? '255,210,80' : '255,255,220',
+          color: Math.random() > 0.4 ? '255,220,100' : '255,255,220',
           fontStr: makeFontStr(sz),
-          glowFontStr: makeFontStr(sz + 8),
+          glowFontStr: makeFontStr(sz + 10),
         });
       }
     }
     sigsRef.current = sigs;
 
-    // Ambient floaters — reduced to 8 to keep focus on brain
+    // 4. Ambient floaters in the background
     const floats: FloatSym[] = [];
-    for (let i = 0; i < 8; i++) {
-      const sz = 10 + Math.random() * 12;
+    for (let i = 0; i < 15; i++) {
+      const sz = 10 + Math.random() * 15;
       floats.push({
         x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.2,
-        vy: -0.06 - Math.random() * 0.12,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: -0.05 - Math.random() * 0.15,
         symbol: SYNTAX[Math.floor(Math.random() * SYNTAX.length)],
         size: sz,
-        alpha: 0.012 + Math.random() * 0.028,
+        alpha: 0.01 + Math.random() * 0.03,
         phase: Math.random() * Math.PI * 2,
         fontStr: makeFontStr(sz),
       });
@@ -350,7 +264,7 @@ export const CodeBrain = () => {
 
     wavesRef.current = [];
     wTimerRef.current = 0;
-  }, [toScreen, fromScreen]);
+  }, []);
 
   // ─── Canvas Setup & Animation ───
   useEffect(() => {
@@ -361,7 +275,7 @@ export const CodeBrain = () => {
 
     let cw = 0, ch = 0;
 
-    // ─── Visibility observer: pause rendering when off-screen ───
+    // Visibility observer: pause rendering when off-screen
     const observer = new IntersectionObserver(
       ([entry]) => { visibleRef.current = entry.isIntersecting; },
       { threshold: 0.05 }
@@ -386,14 +300,13 @@ export const CodeBrain = () => {
     resize();
     window.addEventListener('resize', resize);
 
-    // ─── GLOBAL mouse listener — works even when hovering over text overlay ───
+    // GLOBAL mouse listener 
     const onMouse = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
       mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
     };
     const onLeave = () => { mouseRef.current = { x: -9999, y: -9999 }; };
 
-    // Attach to window instead of canvas so it works through all z-index layers
     window.addEventListener('mousemove', onMouse);
     window.addEventListener('mouseleave', onLeave);
 
@@ -410,7 +323,6 @@ export const CodeBrain = () => {
     const animate = () => {
       animRef.current = requestAnimationFrame(animate);
 
-      // Skip rendering when off-screen
       if (!visibleRef.current || !cw || !ch) return;
 
       const dt = 0.016;
@@ -418,64 +330,69 @@ export const CodeBrain = () => {
       const t = tRef.current;
       const mouse = mouseRef.current;
 
-      // ── Clear ──
-      ctx.fillStyle = '#0A0A0A';
-      ctx.fillRect(0, 0, cw, ch);
+      // 1. Clear background
+      ctx.clearRect(0, 0, cw, ch);
 
       const brainCx = cw * 0.50;
       const brainCy = ch * 0.50;
       const brainR = Math.min(cw, ch) * 0.40;
 
-      // ── 1. Background radial glow ──
+      // 2. Background radial glow
       const bgP = 0.6 + Math.sin(t * 0.7) * 0.4;
-      const bgG = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainR * 1.2);
-      bgG.addColorStop(0, `rgba(255,70,0,${0.07 * bgP})`);
+      const bgG = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainR * 1.5);
+      bgG.addColorStop(0, `rgba(255,70,0,${0.06 * bgP})`);
       bgG.addColorStop(0.35, `rgba(200,50,0,${0.03 * bgP})`);
       bgG.addColorStop(0.65, `rgba(255,100,0,${0.015 * bgP})`);
       bgG.addColorStop(1, 'transparent');
       ctx.fillStyle = bgG;
       ctx.fillRect(0, 0, cw, ch);
 
-      // ── 2. Neural network halo rings ──
-      ctx.setLineDash([3, 8]);
-      ctx.lineWidth = 0.7;
-      for (let r = 0; r < 3; r++) {
-        const rad = brainR * (0.95 + r * 0.15);
-        const rA = (0.045 - r * 0.013) * (0.5 + Math.sin(t * 0.5 + r * 1.1) * 0.5);
+      // 3. Draw static glowing neural pathways behind the brain
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      for (const pts of pathScreensRef.current) {
+        if (pts.length < 2) continue;
         ctx.beginPath();
-        ctx.arc(brainCx, brainCy, rad, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,106,0,${rA})`;
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) {
+          ctx.lineTo(pts[i][0], pts[i][1]);
+        }
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(255,106,0,0.15)`;
+        ctx.stroke();
+        // Inner brighter core
+        ctx.lineWidth = 0.4;
+        ctx.strokeStyle = `rgba(255,180,50,0.3)`;
         ctx.stroke();
       }
-      ctx.setLineDash([]);
 
-      // ── 3. Glow waves — max 2 active ──
+      // 4. Glow waves originating from the center
       wTimerRef.current += dt;
-      if (wTimerRef.current > 2.5 && wavesRef.current.length < 2) {
+      if (wTimerRef.current > 3 && wavesRef.current.length < 2) {
         wTimerRef.current = 0;
         wavesRef.current.push({
-          cx: brainCx + (Math.random() - 0.5) * brainR * 0.4,
-          cy: brainCy + (Math.random() - 0.5) * brainR * 0.3,
-          radius: 0, maxR: brainR * 1.1,
-          speed: 85 + Math.random() * 65,
+          cx: brainCx + (Math.random() - 0.5) * brainR * 0.2,
+          cy: brainCy + (Math.random() - 0.5) * brainR * 0.2,
+          radius: 0, maxR: brainR * 1.2,
+          speed: 80 + Math.random() * 50,
         });
       }
       for (let i = wavesRef.current.length - 1; i >= 0; i--) {
         const w = wavesRef.current[i];
         w.radius += w.speed * dt;
         if (w.radius > w.maxR) { wavesRef.current.splice(i, 1); continue; }
-        const wA = 0.3 * (1 - w.radius / w.maxR);
+        const wA = 0.4 * (1 - w.radius / w.maxR);
         ctx.beginPath();
         ctx.arc(w.cx, w.cy, w.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,150,30,${wA * 0.05})`;
-        ctx.lineWidth = 15;
+        ctx.strokeStyle = `rgba(255,150,30,${wA * 0.08})`;
+        ctx.lineWidth = 10;
         ctx.stroke();
-        ctx.strokeStyle = `rgba(255,106,0,${wA * 0.18})`;
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = `rgba(255,106,0,${wA * 0.2})`;
+        ctx.lineWidth = 1;
         ctx.stroke();
       }
 
-      // ── 4. Ambient floating symbols ──
+      // 5. Ambient floating symbols
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       for (const f of floatsRef.current) {
@@ -484,18 +401,18 @@ export const CodeBrain = () => {
         if (f.x > cw + 50) f.x = -50;
         if (f.y < -50) f.y = ch + 50;
         if (f.y > ch + 50) f.y = -50;
-        const fa = f.alpha + Math.sin(t + f.phase) * 0.008;
+        const fa = f.alpha + Math.sin(t + f.phase) * 0.01;
         if (fa <= 0) continue;
         setFont(f.fontStr);
         ctx.fillStyle = `rgba(255,106,0,${fa})`;
         ctx.fillText(f.symbol, f.x, f.y);
       }
 
-      // ── 5. BRAIN SYMBOLS — the main visual ──
-      const REP_R = 140;
-      const REP_F = 11;
-      const SPR = 0.05;
-      const DMP = 0.85;
+      // 6. BRAIN SYMBOLS — The core logic
+      const REP_R = 150; // Mouse repulsion radius
+      const REP_F = 14;  // Repulsion force
+      const SPR = 0.08;  // Spring back force
+      const DMP = 0.82;  // Damping for smooth settling
       const waves = wavesRef.current;
       const waveLen = waves.length;
 
@@ -521,10 +438,10 @@ export const CodeBrain = () => {
         s.x += s.vx;
         s.y += s.vy;
 
-        // Pulsation
+        // Pulsation based on edge and brightness
         const pulse = s.isEdge
-          ? 0.55 + 0.45 * Math.sin(t * 1.8 + s.phase)
-          : 0.4 + 0.6 * Math.sin(t * 2.2 + s.phase);
+          ? 0.6 + 0.4 * Math.sin(t * 1.5 + s.phase)
+          : 0.4 + 0.6 * Math.sin(t * 2.0 + s.phase);
 
         let alpha = s.baseAlpha * pulse;
 
@@ -534,41 +451,41 @@ export const CodeBrain = () => {
             const wave = waves[wi];
             const wd = Math.sqrt((s.x - wave.cx) ** 2 + (s.y - wave.cy) ** 2);
             const diff = Math.abs(wd - wave.radius);
-            if (diff < 50) {
-              alpha += (1 - diff / 50) * (1 - wave.radius / wave.maxR) * 0.55;
+            if (diff < 60) {
+              alpha += (1 - diff / 60) * (1 - wave.radius / wave.maxR) * 0.6;
             }
           }
         }
 
         // Mouse proximity glow
-        const REP_R_GLOW = REP_R * 1.3;
+        const REP_R_GLOW = REP_R * 1.4;
         if (d2 < REP_R_GLOW * REP_R_GLOW && d2 > 0) {
           const d = Math.sqrt(d2);
-          alpha += (1 - d / REP_R_GLOW) * 0.35;
+          alpha += (1 - d / REP_R_GLOW) * 0.4;
         }
 
-        // Displacement glow
+        // Displacement glow (glows brighter when pushed by mouse)
         const dispX = s.homeX - s.x;
         const dispY = s.homeY - s.y;
         const disp = Math.sqrt(dispX * dispX + dispY * dispY);
-        alpha += Math.min(disp / 30, 0.5);
+        alpha += Math.min(disp / 40, 0.6);
 
         alpha = Math.min(alpha, 1);
-        if (alpha < 0.03) continue;
+        if (alpha < 0.02) continue;
 
         // Draw symbol
         setFont(s.fontStr);
         ctx.fillStyle = `rgba(${s.color},${alpha})`;
         ctx.fillText(s.symbol, s.x, s.y);
 
-        // Extra glow halo for bright edge particles
-        if (s.isEdge && alpha > 0.4) {
-          ctx.fillStyle = `rgba(${s.color},${alpha * 0.06})`;
+        // Extra glow halo for bright/edge particles
+        if (s.brightness > 0.6 && alpha > 0.4) {
+          ctx.fillStyle = `rgba(${s.color},${alpha * 0.1})`;
           ctx.fillText(s.symbol, s.x, s.y);
         }
       }
 
-      // ── 6. Signal particles ──
+      // 7. Signal particles traveling along neural pathways
       for (const sig of sigsRef.current) {
         sig.progress += sig.speed;
         if (sig.progress > 1) sig.progress -= 1;
@@ -584,38 +501,38 @@ export const CodeBrain = () => {
         const x = pts[i0][0] + (pts[i0+1][0] - pts[i0][0]) * frac;
         const y = pts[i0][1] + (pts[i0+1][1] - pts[i0][1]) * frac;
 
-        const sA = 0.5 + 0.5 * Math.sin(t * 10 + sig.progress * 40);
+        const sA = 0.5 + 0.5 * Math.sin(t * 8 + sig.progress * 30);
 
-        // Glow halo
-        ctx.fillStyle = `rgba(${sig.color},${sA * 0.12})`;
+        // Signal glow halo
+        ctx.fillStyle = `rgba(${sig.color},${sA * 0.15})`;
         setFont(sig.glowFontStr);
         ctx.fillText(sig.symbol, x, y);
 
-        // Core
-        ctx.fillStyle = `rgba(${sig.color},${sA * 0.85})`;
+        // Signal core
+        ctx.fillStyle = `rgba(${sig.color},${sA * 0.9})`;
         setFont(sig.fontStr);
         ctx.fillText(sig.symbol, x, y);
 
-        // White hot center
-        ctx.fillStyle = `rgba(255,255,255,${sA * 0.5})`;
+        // White hot center spark
+        ctx.fillStyle = `rgba(255,255,255,${sA * 0.7})`;
         ctx.fillRect(x - 1, y - 1, 2, 2);
       }
 
-      // ── 7. Mouse flashlight ──
+      // 8. Mouse flashlight (ambient glow under cursor)
       if (mouse.x > 0 && mouse.x < cw && mouse.y > 0 && mouse.y < ch) {
-        const mg = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 160);
-        mg.addColorStop(0, 'rgba(255,110,20,0.04)');
-        mg.addColorStop(0.5, 'rgba(255,70,0,0.012)');
+        const mg = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 180);
+        mg.addColorStop(0, 'rgba(255,120,30,0.06)');
+        mg.addColorStop(0.5, 'rgba(255,80,0,0.015)');
         mg.addColorStop(1, 'transparent');
         ctx.fillStyle = mg;
-        ctx.fillRect(mouse.x - 160, mouse.y - 160, 320, 320);
+        ctx.fillRect(mouse.x - 180, mouse.y - 180, 360, 360);
       }
 
-      // ── 8. Central bloom ──
+      // 9. Central bloom
       const bP = 0.45 + Math.sin(t * 0.8) * 0.55;
-      const bl = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainR * 0.4);
-      bl.addColorStop(0, `rgba(255,106,0,${0.025 * bP})`);
-      bl.addColorStop(0.5, `rgba(255,130,30,${0.01 * bP})`);
+      const bl = ctx.createRadialGradient(brainCx, brainCy, 0, brainCx, brainCy, brainR * 0.5);
+      bl.addColorStop(0, `rgba(255,106,0,${0.03 * bP})`);
+      bl.addColorStop(0.5, `rgba(255,140,40,${0.015 * bP})`);
       bl.addColorStop(1, 'transparent');
       ctx.fillStyle = bl;
       ctx.fillRect(0, 0, cw, ch);
@@ -630,7 +547,7 @@ export const CodeBrain = () => {
       window.removeEventListener('mouseleave', onLeave);
       observer.disconnect();
     };
-  }, [init, toScreen]);
+  }, [init]);
 
   return (
     <canvas
@@ -640,8 +557,7 @@ export const CodeBrain = () => {
         width: '100vw',
         height: '100vh',
         mixBlendMode: 'screen',
-        backgroundColor: '#0A0A0A',
-        pointerEvents: 'none', // Let mouse events pass through to window listener
+        pointerEvents: 'none', 
       }}
       aria-hidden="true"
     />
