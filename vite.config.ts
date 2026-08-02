@@ -14,14 +14,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'animations': ['framer-motion', 'gsap', '@studio-freight/lenis'],
-        }
-      }
-    }
-  }
+  // build: {
+  //   rollupOptions: {
+  //     output: {
+  //       manualChunks: undefined
+  //     }
+  //   }
+  // }
 }));
