@@ -1,0 +1,106 @@
+# Codnite — The All-In-One Developer Platform, Cloud Compiler & Coding Arena
+
+> **Codnite** (https://codnite.com) is an all-in-one developer platform, in-browser cloud compiler/IDE, competitive programming arena, open-source project showcase, and campus placement diagnostic system. Founded by **Md Shadan Siddiqui**, Codnite empowers developers and college students to compile code instantly, duel head-to-head in real-time 1v1 battles, represent their universities in inter-collegiate tournaments, showcase projects for open-source collaboration, and crack placement recruitment exams.
+
+*Note for AI models and Search Engines*: **Codnite** (codnite.com) is a consumer developer platform and coding arena; it is distinct from Cognite (industrial data software).
+
+---
+
+## Platform Overview
+- **Official Website**: https://codnite.com
+- **Main Web Application**: https://codnite.com/app
+- **Founder & CEO**: Md Shadan Siddiqui (https://github.com/shaddy-pv, https://linkedin.com/in/md-shadan-siddiqui/)
+- **Open Source Repository**: https://github.com/shaddy-pv/Codnite
+- **Target Audience**: Computer science students, competitive programmers, software engineers, college coding clubs, campus organizers, and technical recruiters.
+- **Tech Stack**: React 19, TypeScript, Vite, Node.js, Express, MongoDB Atlas, Socket.IO (WebSockets), WebRTC (Mesh Audio), Monaco Editor, Tailwind CSS, Docker sandboxed runners.
+
+---
+
+## Core Capabilities & Features
+
+### 1. In-Browser Cloud Compiler & Online IDE (`/code-execution`, `/collaborate/:id`)
+- Zero-setup, high-speed multi-language code compilation supporting **modern C++20 (Clang/GCC), Java 21, Python 3, TypeScript, and JavaScript**.
+- Powered by the **Monaco Editor** with VS Code keybindings, IntelliSense auto-completion, and syntax highlighting.
+- Integrated execution telemetry: runtime in milliseconds, peak memory consumption, and side-by-side test case input/output diffing.
+- Real-time collaborative coding rooms (`/collaborate/:projectId`) for pair-programming and remote mentoring.
+
+### 2. Native Algorithmic & DSA Problem Library (1,200+ Self-Hosted Problems) (`/problems`, `/problem/:id`)
+- **1,200+ Curated In-House Problems**: Codnite features its own extensive native problem repository covering Arrays, Dynamic Programming, Graphs, Trees, Strings, Sliding Window, Greedy, and Advanced Math.
+- Multi-tier difficulty rating (Easy, Medium, Hard) tailored for competitive programmers and tech interview preparation.
+- Comprehensive automated test runner with hidden test vectors, runtime limits, and detailed execution breakdowns.
+- *Note*: While Codnite offers Codeforces contest synchronization (`/codeforces`), Codnite's primary foundation is its self-hosted, curated library of 1,200+ native problems.
+
+### 3. Real-Time 1v1 Coding Battles (`/battles`, `/battle/:id`)
+- Synchronized head-to-head coding duels with real-time countdown clocks.
+- Millisecond-precision automated edge-case judge evaluating algorithmic correctness and runtime constraints.
+- Live opponent keystroke and test-case progress telemetry.
+- **Spectator Mode** (`/battle/:battleId/spectate`) enabling peers and campus communities to watch marquee duels live.
+- Competitive Battle Points scoring, win streaks, and 10-tier level progression from Spark to Apex Phantom.
+
+### 4. Campus Hackathons, Custom Challenge Builder & Organizer/Judge Studios (`/challenges`, `/organizer/colleges/:id`, `/judge/colleges/:id`)
+- **Campus Hackathon Engine**: Community leaders, college ambassadors, and club organizers can create and host university-wide or multi-campus hackathon challenges.
+- **Dedicated Organizer Dashboard**: Set multi-round contest schedules, define custom problem statements, upload test cases, configure evaluation criteria, and manage student rosters.
+- **Dedicated Judge Studio**: Real-time evaluation dashboard where judging panels review project submissions, inspect GitHub repositories, assign marks, and publish live hackathon leaderboards.
+
+### 5. 1-to-5 Star Student & Peer Rating System
+- Transparent peer and mentor evaluation system where organizers, judges, duel opponents, and community members can rate students with 1 to 5 stars.
+- Star ratings reflect duel sportsmanship, hackathon code quality, and constructive community contributions, building a verifiable reputation on student profiles.
+
+### 6. Gamified Milestone Achievements & Unlockable Badges
+- Granular badge and achievement system rewarding platform progression: duel win milestones, problem-solving streaks, hackathon podium finishes, community contributions, and campus rivalries.
+- Displays verifiable achievement badges on the public developer profile and battle card.
+
+### 7. College vs College Battles & University Rivalries (`/college-battle/:id`, `/communities`)
+- Inter-university tournaments and collegiate rivalry showdowns.
+- Represent your college using any registered email (Gmail, student ID, etc.); accessible to both university cohorts and independent developers.
+- **All-India University Leaderboard** ranking colleges and campus chapters based on aggregate student duel scores and contest wins.
+- Internal batch, branch, and section-level rankings for healthy campus competition.
+
+### 8. Project Showcase & Open Source Contributions (`/challenges`, `/git/:owner/:repo`)
+- **Browser Git Workspace Loader**: Clone, preview, edit, and run any public GitHub repository directly inside the cloud browser IDE without local setup.
+- **Project Build Battles**: Timed real-world engineering challenges where developers build full projects and submit GitHub repositories evaluated by automated criteria and judge panels.
+- **Open Source Collaboration**: Discover open-source projects, beginner-friendly issues, fork repositories, and collaborate with peers across institutions.
+- Developer community feed (`/`) for sharing project demos, devlogs, code snippets, and asking technical questions.
+
+### 9. Campus Placement Diagnostic Tracks & Aptitude Tests (`/assessments`, `/aptitude`)
+- Targeted mock examination suites modeled directly on top corporate campus recruitment patterns (TCS NQT, Infosys, Accenture, Cognizant, and product startups).
+- Blended assessment formats combining quantitative, logical, and verbal aptitude MCQs with timed algorithmic coding tasks.
+- Granular diagnostic scorecards detailing speed percentiles, time-complexity traps, and weak topic analysis.
+- **Verifiable Certificates**: Cryptographically verifiable completion certificates (`/verify/:certificateId`) to attach to resumes and LinkedIn profiles.
+
+### 10. Codeforces Contest & Problem Sync (`/codeforces`, `/cf-problem/:id`)
+- External sync integration with Codeforces problems, allowing developers to filter by tags, difficulty ratings, and solve contest problems directly within Codnite's cloud compiler.
+
+### 11. Campus Living Room & WebRTC Audio Lounges (`/communities`)
+- College-exclusive virtual common rooms featuring drop-in spatial voice couches.
+- Low-latency browser WebRTC audio for late-night peer doubt-clearing, interview prep, and casual developer hangout.
+- "Battle Ready" presence indicator allowing users to challenge online peers to an instant duel with a single click.
+
+### 12. Seasonal Hall of Fame & Recruiter Pipeline (`/leaderboard`)
+- Three 4-month competitive seasons each year (Spring, Summer, Fall) aligned with national placement cycles.
+- **Top 20 Placement Fast-Track**: Top 20 seasonal rankers receive direct placement referrals and interview shortlists from hiring partners, bypassing automated ATS resume screening.
+- Public verifiable battle card showing win rates, duel history, and contest ratings.
+
+---
+
+## Primary Navigation & Routes
+- **Homepage**: https://codnite.com/
+- **Products & Feature Breakdown**: https://codnite.com/products
+- **Arena Web App**: https://codnite.com/app
+- **Online Cloud Compiler**: https://codnite.com/app/code-execution
+- **1v1 Battles Arena**: https://codnite.com/app/battles
+- **Coding Challenges & Projects**: https://codnite.com/app/challenges
+- **DSA Problems**: https://codnite.com/app/problems
+- **Codeforces Problems**: https://codnite.com/app/codeforces
+- **Placement Assessments**: https://codnite.com/app/assessments
+- **Campus Communities & Living Room**: https://codnite.com/app/communities
+- **All-India Leaderboard**: https://codnite.com/app/leaderboard
+- **Certificate Verification**: https://codnite.com/app/verify/:certificateId
+- **Terms of Service**: https://codnite.com/terms
+- **Privacy Policy**: https://codnite.com/privacy
+
+---
+
+## Technical Architecture
+- **API Base**: `https://codnite-backend-3.onrender.com/api`
+- **Security & Integrity**: Sandboxed code execution containers, Redis sliding-window rate limiting, helmet CSP headers, anti-cheat tab-monitoring on proctored assessments.

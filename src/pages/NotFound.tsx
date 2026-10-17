@@ -6,7 +6,7 @@ const NotFound = () => {
 
   useEffect(() => {
     // If this is an /app* path hitting the landing page server,
-    // hard-redirect to the canonical app URL (absolute, not relative —
+    // hard-redirect to the canonical app URL (absolute, not relative -
     // relative /app/ would just loop back to this same server).
     if (location.pathname.startsWith("/app")) {
       // In local dev the main app runs at 5173; in production it's codnite.com/app/
@@ -22,7 +22,7 @@ const NotFound = () => {
       return;
     }
 
-    // Genuine 404 — log it
+    // Genuine 404 - log it
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);
 

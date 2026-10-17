@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { runWhenIdle } from '@/lib/idle';
 
 interface Star {
   x: number;
@@ -22,9 +23,9 @@ interface ShootingStar {
 }
 
 /**
- * StarryBackground — fixed canvas behind all sections (except hero).
+ * StarryBackground - fixed canvas behind all sections (except hero).
  * Stars twinkle gently. Click anywhere below the hero to trigger a shooting star.
- * pointer-events: none — clicks are captured via window listener so content stays interactive.
+ * pointer-events: none - clicks are captured via window listener so content stays interactive.
  */
 export const StarryBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,7 +38,7 @@ export const StarryBackground = () => {
   // Generate stars on init/resize
   const initStars = useCallback((w: number, h: number) => {
     const stars: Star[] = [];
-    // Target ~1 star per 4000 px² — enough to feel full but not cluttered
+    // Target ~1 star per 4000 px² - enough to feel full but not cluttered
     const count = Math.floor((w * h) / 4000);
 
     for (let i = 0; i < count; i++) {
@@ -112,31 +113,29 @@ export const StarryBackground = () => {
 
     let cw = 0, ch = 0;
     const dprRef = { current: 1 };
+    let isMounted = true;
 
     const resize = () => {
+      if (!canvasRef.current) return;
+      const c = canvasRef.current;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       dprRef.current = dpr;
       cw = window.innerWidth;
       ch = window.innerHeight;
-      canvas.width = cw * dpr;
-      canvas.height = ch * dpr;
-      canvas.style.width = `${cw}px`;
-      canvas.style.height = `${ch}px`;
+      c.width = cw * dpr;
+      c.height = ch * dpr;
+      c.style.width = `${cw}px`;
+      c.style.height = `${ch}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       initStars(cw, ch);
     };
 
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Visibility — pause when tab is hidden
+    // Visibility - pause when tab is hidden
     const onVisibility = () => { visibleRef.current = !document.hidden; };
-    document.addEventListener('visibilitychange', onVisibility);
 
-    // Click handler — window level so it works through content
+    // Click handler - window level so it works through content
     const onClick = (e: MouseEvent) => {
       // Only trigger below the hero (roughly 100vh)
-      const heroHeight = window.innerHeight;
       if (e.clientY < 80) return; // Don't trigger in navbar area
 
       // Translate page click to canvas coordinates
@@ -144,10 +143,9 @@ export const StarryBackground = () => {
       spawnShootingStar(e.clientX, e.clientY);
     };
 
-    window.addEventListener('click', onClick);
-
     // ─── Render Loop ───
     const animate = () => {
+      if (!isMounted) return;
       animRef.current = requestAnimationFrame(animate);
       if (!visibleRef.current || !cw || !ch) return;
 
@@ -155,7 +153,7 @@ export const StarryBackground = () => {
       tRef.current += dt;
       const t = tRef.current;
 
-      // Clear with transparency — this canvas layers BEHIND content
+      // Clear with transparency - this canvas layers BEHIND content
       ctx.clearRect(0, 0, cw, ch);
 
       // ── Draw Stars ──
@@ -248,9 +246,18 @@ export const StarryBackground = () => {
       }
     };
 
-    animRef.current = requestAnimationFrame(animate);
+    const cleanupIdle = runWhenIdle(() => {
+      if (!isMounted || !canvasRef.current) return;
+      resize();
+      window.addEventListener('resize', resize);
+      window.addEventListener('click', onClick);
+      document.addEventListener('visibilitychange', onVisibility);
+      animRef.current = requestAnimationFrame(animate);
+    });
 
     return () => {
+      isMounted = false;
+      cleanupIdle();
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', resize);
       window.removeEventListener('click', onClick);

@@ -408,7 +408,7 @@ export const CodeBrain = () => {
         ctx.fillText(f.symbol, f.x, f.y);
       }
 
-      // 6. BRAIN SYMBOLS — The core logic
+      // 6. BRAIN SYMBOLS - The core logic
       const REP_R = 150; // Mouse repulsion radius
       const REP_F = 14;  // Repulsion force
       const SPR = 0.08;  // Spring back force

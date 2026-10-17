@@ -1,136 +1,153 @@
-'use client';
+import React, { useState } from 'react';
+import AsciiHeroBackground from './AsciiHeroBackground';
+import ScrambleText from './ScrambleText';
+import { ArrowRight, Trophy } from 'lucide-react';
 
-import { CSSProperties, useEffect, useRef } from 'react';
-import HeroNetworkField from './HeroNetworkField';
-import FloatingStatCard from './FloatingStatCard';
+interface HeroSectionProps {
+  isLoaded?: boolean;
+}
 
-export default function HeroSection() {
-  const parallaxRef = useRef<HTMLDivElement>(null);
+// Helper for main app URL in dev and prod
+const getAppUrl = (path: string = '') => {
+  if (typeof window !== 'undefined' && window.location.port === '4173') {
+    return `http://localhost:5173/app${path}`;
+  }
+  return `/app${path}`;
+};
 
-  useEffect(() => {
-    const el = parallaxRef.current;
-    if (!el) return;
-    const reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
-    if (reduceMotion) return;
+// Check if user has an active authenticated session
+const getGetStartedUrl = () => {
+  if (typeof window === 'undefined') return '/app/?action=signup';
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  const hasSession = Boolean(token && user);
 
-    let raf = 0;
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
+  const isDevPort = window.location.port === '4173';
+  const baseUrl = isDevPort ? 'http://localhost:5173/app' : '/app';
 
-    function onMove(e: MouseEvent) {
-      const { innerWidth, innerHeight } = window;
-      targetX = (e.clientX / innerWidth - 0.5) * 2;
-      targetY = (e.clientY / innerHeight - 0.5) * 2;
-    }
+  return hasSession ? `${baseUrl}/` : `${baseUrl}/?action=signup`;
+};
 
-    function tick() {
-      currentX += (targetX - currentX) * 0.06;
-      currentY += (targetY - currentY) * 0.06;
-      el!.style.setProperty('--px', currentX.toFixed(3));
-      el!.style.setProperty('--py', currentY.toFixed(3));
-      raf = requestAnimationFrame(tick);
-    }
-
-    window.addEventListener('mousemove', onMove);
-    raf = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  const parallaxStyle = { '--px': 0, '--py': 0 } as CSSProperties;
+export default function HeroSection({ isLoaded = true }: HeroSectionProps) {
+  const [hoveredLine, setHoveredLine] = useState<number | null>(null);
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#0a0a0c]">
-      <HeroNetworkField />
+    <section className="relative min-h-[800px] sm:min-h-[100dvh] overflow-hidden bg-transparent flex flex-col justify-start lg:justify-center">
+      {/* Real-Time ASCII Human Brain Canvas - Positioned below CTAs on mobile, right-anchored on desktop */}
+      <div className="absolute inset-0 opacity-85 sm:opacity-95 md:opacity-100 transition-opacity duration-700 pointer-events-none z-0">
+        <AsciiHeroBackground />
+      </div>
 
-      {/* subtle vignette so text stays readable over the network */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#0a0a0c_75%)]" />
+      {/* Hero Content anchored on Left Side */}
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 max-w-7xl pt-24 sm:pt-28 lg:pt-20 pb-8 lg:pb-12 pointer-events-none">
+        <div className="max-w-2xl pointer-events-auto text-left">
 
-      <div
-        ref={parallaxRef}
-        style={parallaxStyle}
-        className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 text-center"
-      >
-        <span className="mb-4 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-1 text-xs font-medium tracking-wide text-orange-400">
-          Built for You
-        </span>
+          {/* Main Headline - Stacked Line-by-Line with Responsive Scaling */}
+          <h1
+            className="relative text-[1.95rem] xs:text-[2.2rem] sm:text-5xl lg:text-6xl xl:text-[3.4rem] 2xl:text-[3.75rem] font-extrabold tracking-tight text-white leading-[1.08] select-none"
+          >
+            {/* Line 1: Code. -> Solve. */}
+            <span
+              className="block w-fit h-[1.14em] leading-[1.14em] whitespace-nowrap overflow-hidden cursor-pointer"
+              onMouseEnter={() => setHoveredLine(0)}
+              onMouseLeave={() => setHoveredLine(null)}
+            >
+              <ScrambleText
+                text="Code."
+                hoverText="Solve."
+                isHovered={hoveredLine === 0}
+                ready={isLoaded}
+                delay={100}
+              />
+            </span>
 
-        <h1 className="max-w-3xl text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
-          Compete. Code. <span className="text-orange-500">Climb the Rank.</span>
-        </h1>
+            {/* Line 2: Connect. -> Learn. */}
+            <span
+              className="block w-fit h-[1.14em] leading-[1.14em] whitespace-nowrap overflow-hidden cursor-pointer"
+              onMouseEnter={() => setHoveredLine(1)}
+              onMouseLeave={() => setHoveredLine(null)}
+            >
+              <ScrambleText
+                text="Connect."
+                hoverText="Learn."
+                isHovered={hoveredLine === 1}
+                ready={isLoaded}
+                delay={220}
+              />
+            </span>
 
-        <p className="mt-6 max-w-xl text-base text-white/60 sm:text-lg">
-          1v1 coding battles, college leaderboards, and placement-focused
-          problems — built for students who actually want to get better.
-        </p>
+            {/* Line 3: Compete. -> Lead. */}
+            <span
+              className="block w-fit h-[1.14em] leading-[1.14em] whitespace-nowrap overflow-hidden cursor-pointer"
+              onMouseEnter={() => setHoveredLine(2)}
+              onMouseLeave={() => setHoveredLine(null)}
+            >
+              <ScrambleText
+                text="Compete."
+                hoverText="Lead."
+                isHovered={hoveredLine === 2}
+                ready={isLoaded}
+                delay={340}
+              />
+            </span>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <button className="rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-orange-400">
-            Start Battling
-          </button>
-          <button className="rounded-lg border border-white/15 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white/30 hover:text-white">
-            View Leaderboard
-          </button>
-        </div>
+            {/* Line 4: Climb the Rank. -> And Get Placed. */}
+            <span
+              className="block w-fit h-[1.14em] leading-[1.14em] whitespace-nowrap overflow-hidden cursor-pointer"
+              onMouseEnter={() => setHoveredLine(3)}
+              onMouseLeave={() => setHoveredLine(null)}
+            >
+              <ScrambleText
+                text="Climb the Rank."
+                hoverText="And Get Placed."
+                isHovered={hoveredLine === 3}
+                ready={isLoaded}
+                delay={460}
+                className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6A00] via-[#FFA229] to-[#FFD060]"
+              />
+            </span>
+          </h1>
 
-        {/* Floating cards — desktop only, layered above the vignette */}
-        <div
-          className="pointer-events-none absolute left-[6%] top-[22%] hidden lg:block"
-          style={{
-            transform:
-              'translate3d(calc(var(--px, 0) * -14px), calc(var(--py, 0) * -10px), 0)',
-          }}
-        >
-          <FloatingStatCard delay={0} duration={6.5}>
-            <p className="text-xs text-white/50">Battle Won</p>
-            <p className="text-sm font-semibold text-orange-400">+25 XP</p>
-          </FloatingStatCard>
-        </div>
+          {/* Description - Constrained strictly with drop shadow for supreme legibility on mobile */}
+          <p className="mt-4 sm:mt-5 max-w-[440px] text-sm sm:text-base text-zinc-300/90 leading-relaxed font-normal drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]">
+            Battle in live 1v1 algorithmic duels, tackle placement challenges, and climb campus rankings. Connect through active developer feeds, peer messaging, and tournament arenas.
+          </p>
 
-        <div
-          className="pointer-events-none absolute right-[8%] top-[30%] hidden lg:block"
-          style={{
-            transform:
-              'translate3d(calc(var(--px, 0) * 16px), calc(var(--py, 0) * -12px), 0)',
-          }}
-        >
-          <FloatingStatCard delay={1.2} duration={7}>
-            <p className="text-xs text-white/50">College Rank</p>
-            <p className="text-sm font-semibold text-white">#3</p>
-          </FloatingStatCard>
-        </div>
+          {/* Action CTAs - Side-by-side on mobile, same row on tablet/desktop */}
+          <div className="mt-7 sm:mt-8 flex flex-row items-stretch gap-3 w-full sm:w-auto max-w-xs sm:max-w-none">
+            <a
+              href={getGetStartedUrl()}
+              onClick={(e) => {
+                e.preventDefault();
+                const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                const user = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+                const hasSession = Boolean(token && user);
 
-        <div
-          className="pointer-events-none absolute bottom-[18%] left-[10%] hidden lg:block"
-          style={{
-            transform:
-              'translate3d(calc(var(--px, 0) * -10px), calc(var(--py, 0) * 14px), 0)',
-          }}
-        >
-          <FloatingStatCard delay={2.1} duration={6}>
-            <p className="text-xs text-white/50">Rahul joined</p>
-            <p className="text-sm font-semibold text-white">Live now</p>
-          </FloatingStatCard>
-        </div>
+                const isDevPort = typeof window !== 'undefined' && window.location.port === '4173';
+                const baseUrl = isDevPort ? 'http://localhost:5173/app' : '/app';
 
-        <div
-          className="pointer-events-none absolute bottom-[14%] right-[6%] hidden lg:block"
-          style={{
-            transform:
-              'translate3d(calc(var(--px, 0) * 12px), calc(var(--py, 0) * 10px), 0)',
-          }}
-        >
-          <FloatingStatCard delay={0.6} duration={7.5}>
-            <p className="text-xs text-white/50">Problems Solved</p>
-            <p className="text-sm font-semibold text-orange-400">1,000+</p>
-          </FloatingStatCard>
+                window.location.href = hasSession ? `${baseUrl}/` : `${baseUrl}/?action=signup`;
+              }}
+              className="group relative flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF6A00] to-[#FFA229] px-5 py-3 sm:px-7 sm:py-3.5 text-sm sm:text-[15px] font-bold text-black transition-all duration-200 hover:from-[#ff7919] hover:to-[#ffb24d] hover:-translate-y-0.5 active:translate-y-0 shadow-[0_4px_16px_-2px_rgba(255,106,0,0.35)] text-center select-none cursor-pointer"
+            >
+              <span>Get Started</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 shrink-0" />
+            </a>
+            <button
+              onClick={() => {
+                if ((window as any).lenis) {
+                  (window as any).lenis.scrollTo('#hall-of-fame');
+                } else {
+                  document.getElementById('hall-of-fame')?.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-[#0d0d12]/80 px-5 py-3 sm:px-7 sm:py-3.5 text-sm sm:text-[15px] font-semibold text-zinc-200 backdrop-blur-md transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900/80 hover:text-white hover:-translate-y-0.5 text-center select-none"
+            >
+              <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Leaderboard</span>
+            </button>
+          </div>
+
         </div>
       </div>
     </section>

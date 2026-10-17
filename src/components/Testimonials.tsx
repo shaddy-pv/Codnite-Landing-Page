@@ -31,9 +31,6 @@ const Testimonials = () => {
       {/* Section top divider */}
       <div className="absolute top-0 left-0 right-0 section-divider" />
       
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.03)_0%,transparent_60%)] blur-3xl pointer-events-none" />
-      
       <div className="container mx-auto px-6 relative z-10 max-w-6xl">
         {/* Section Header */}
         <motion.div 
@@ -44,7 +41,7 @@ const Testimonials = () => {
           className="text-center max-w-3xl mx-auto mb-16 md:mb-20 space-y-4"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight">
-            Loved By{' '}
+            <span>Loved By </span>
             <span className="text-transparent bg-clip-text" style={{
               backgroundImage: 'linear-gradient(135deg, #FF6A00, #FFB340)',
             }}>Coders</span>

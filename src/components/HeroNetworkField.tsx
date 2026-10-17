@@ -1,17 +1,20 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { runWhenIdle } from '@/lib/idle';
 
 /**
  * HeroNetworkField
  * Canvas 2D node-network background for the Codnite hero.
- * No extra deps (no three.js / r3f) — cheap on bundle size and paint cost.
+ * No extra deps (no three.js / r3f) - cheap on bundle size and paint cost.
  *
  * Swap ACCENT_RGB to match your exact Codnite orange.
  */
 
 const ACCENT_RGB = '255, 106, 0'; // <- replace with your brand orange
 const CONNECT_DIST = 150;
+const MAX_DIST = 150;
+const MOUSE_DIST = 150;
 
 interface Node {
   x: number;
@@ -49,19 +52,22 @@ export default function HeroNetworkField() {
     let nodes: Node[] = [];
     let particles: Particle[] = [];
     let raf = 0;
+    let isMounted = true;
 
     const isMobile = () => window.innerWidth < 768;
     const rgba = (o: number) => `rgba(${ACCENT_RGB}, ${o})`;
 
     function resize() {
-      const parent = canvas!.parentElement;
+      if (!canvasRef.current) return;
+      const c = canvasRef.current;
+      const parent = c.parentElement;
       width = parent ? parent.clientWidth : window.innerWidth;
       height = parent ? parent.clientHeight : window.innerHeight;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas!.width = width * dpr;
-      canvas!.height = height * dpr;
-      canvas!.style.width = width + 'px';
-      canvas!.style.height = height + 'px';
+      c.width = width * dpr;
+      c.height = height * dpr;
+      c.style.width = width + 'px';
+      c.style.height = height + 'px';
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
       seed();
     }
@@ -89,113 +95,130 @@ export default function HeroNetworkField() {
     function drawFrame(time: number) {
       ctx!.clearRect(0, 0, width, height);
 
-      for (const n of nodes) {
-        if (!reduceMotion) {
-          n.x += n.vx;
-          n.y += n.vy;
-          if (n.x < 0 || n.x > width) n.vx *= -1;
-          if (n.y < 0 || n.y > height) n.vy *= -1;
-
-          const dx = mouseRef.current.x - n.x;
-          const dy = mouseRef.current.y - n.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < 120) {
-            n.x -= dx * 0.0015;
-            n.y -= dy * 0.0015;
-          }
-        }
-      }
-
+      // Draw faint connections between nearby nodes
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
-          const a = nodes[i];
-          const b = nodes[j];
-          const dist = Math.hypot(a.x - b.x, a.y - b.y);
-          if (dist < CONNECT_DIST) {
-            const o = (1 - dist / CONNECT_DIST) * 0.35;
-            ctx!.strokeStyle = rgba(o);
-            ctx!.lineWidth = 1;
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < MAX_DIST) {
+            const alpha = (1 - dist / MAX_DIST) * 0.18;
             ctx!.beginPath();
-            ctx!.moveTo(a.x, a.y);
-            ctx!.lineTo(b.x, b.y);
+            ctx!.strokeStyle = rgba(alpha);
+            ctx!.lineWidth = 0.8;
+            ctx!.moveTo(nodes[i].x, nodes[i].y);
+            ctx!.lineTo(nodes[j].x, nodes[j].y);
             ctx!.stroke();
           }
         }
       }
 
-      for (const n of nodes) {
-        const pulse = reduceMotion
-          ? 0.6
-          : 0.5 + Math.sin(time * 0.002 + n.phase) * 0.5;
-        const r = n.radius + pulse * 1.2;
-        const grad = ctx!.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 4);
-        grad.addColorStop(0, rgba(0.5 * pulse + 0.2));
-        grad.addColorStop(1, rgba(0));
-        ctx!.fillStyle = grad;
-        ctx!.beginPath();
-        ctx!.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
-        ctx!.fill();
+      // Mouse interactive connections
+      if (mouseRef.current.x > 0) {
+        for (let i = 0; i < nodes.length; i++) {
+          const dx = mouseRef.current.x - nodes[i].x;
+          const dy = mouseRef.current.y - nodes[i].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
-        ctx!.fillStyle = rgba(0.9);
+          if (dist < MOUSE_DIST) {
+            const alpha = (1 - dist / MOUSE_DIST) * 0.45;
+            ctx!.beginPath();
+            ctx!.strokeStyle = rgba(alpha);
+            ctx!.lineWidth = 1;
+            ctx!.moveTo(nodes[i].x, nodes[i].y);
+            ctx!.lineTo(mouseRef.current.x, mouseRef.current.y);
+            ctx!.stroke();
+          }
+        }
+      }
+
+      // Draw and update animated particles along connections
+      for (const p of particles) {
+        if (!nodes[p.from] || !nodes[p.to]) continue;
+        p.t += p.speed;
+        if (p.t >= 1) {
+          Object.assign(p, spawnParticle());
+          continue;
+        }
+
+        const px = nodes[p.from].x + (nodes[p.to].x - nodes[p.from].x) * p.t;
+        const py = nodes[p.from].y + (nodes[p.to].y - nodes[p.from].y) * p.t;
+
         ctx!.beginPath();
-        ctx!.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx!.fillStyle = rgba(0.85);
+        ctx!.arc(px, py, 1.8, 0, Math.PI * 2);
         ctx!.fill();
       }
 
-      if (!reduceMotion) {
-        for (const p of particles) {
-          p.t += p.speed;
-          if (p.t >= 1) Object.assign(p, spawnParticle());
-          const a = nodes[p.from];
-          const b = nodes[p.to];
-          if (!a || !b) continue;
-          const x = a.x + (b.x - a.x) * p.t;
-          const y = a.y + (b.y - a.y) * p.t;
-          ctx!.fillStyle = rgba(0.9);
-          ctx!.beginPath();
-          ctx!.arc(x, y, 1.8, 0, Math.PI * 2);
-          ctx!.fill();
-        }
+      // Draw nodes with subtle pulse
+      for (const node of nodes) {
+        const pulse = Math.sin(time * 0.002 + node.phase) * 0.4 + 0.6;
+        ctx!.beginPath();
+        ctx!.fillStyle = rgba(0.55 * pulse);
+        ctx!.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx!.fill();
+
+        // Update position
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // Bounce off canvas edges
+        if (node.x < 0 || node.x > width) node.vx *= -1;
+        if (node.y < 0 || node.y > height) node.vy *= -1;
       }
     }
 
     function loop(time: number) {
+      if (!isMounted) return;
       drawFrame(time);
-      if (!reduceMotion) raf = requestAnimationFrame(loop);
-    }
-
-    function onMouseMove(e: MouseEvent) {
-      const rect = canvas!.getBoundingClientRect();
-      mouseRef.current.x = e.clientX - rect.left;
-      mouseRef.current.y = e.clientY - rect.top;
-    }
-    function onMouseLeave() {
-      mouseRef.current.x = -9999;
-      mouseRef.current.y = -9999;
-    }
-
-    resize();
-    window.addEventListener('resize', resize);
-    canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('mouseleave', onMouseLeave);
-
-    if (reduceMotion) {
-      drawFrame(0); // static single frame, no RAF loop
-    } else {
       raf = requestAnimationFrame(loop);
     }
 
+    function onMouseMove(e: MouseEvent) {
+      if (!canvasRef.current) return;
+      const rect = canvasRef.current.getBoundingClientRect();
+      mouseRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    }
+
+    function onMouseLeave() {
+      mouseRef.current = { x: -9999, y: -9999 };
+    }
+
+    const cleanupIdle = runWhenIdle(() => {
+      if (!isMounted || !canvasRef.current) return;
+
+      resize();
+      window.addEventListener('resize', resize);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseleave', onMouseLeave);
+
+      if (reduceMotion) {
+        drawFrame(0); // static single frame, no RAF loop
+      } else {
+        raf = requestAnimationFrame(loop);
+      }
+    });
+
     return () => {
+      isMounted = false;
+      cleanupIdle();
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
-      canvas.removeEventListener('mousemove', onMouseMove);
-      canvas.removeEventListener('mouseleave', onMouseLeave);
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('mousemove', onMouseMove);
+        canvasRef.current.removeEventListener('mouseleave', onMouseLeave);
+      }
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
+      suppressHydrationWarning
       className="absolute inset-0 h-full w-full"
       aria-hidden="true"
     />

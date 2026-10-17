@@ -108,7 +108,7 @@ export const Hero = () => {
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] animate-pulse" />
           <span className="text-[#FF6A00]/90 text-xs font-mono tracking-wider uppercase">
-            Developer Platform — Now Live
+            Developer Platform - Now Live
           </span>
         </div>
 
@@ -144,7 +144,7 @@ export const Hero = () => {
           Codnite is where developers stop learning alone and start building together.
         </p>
 
-        {/* CTA buttons — re-enable pointer-events for clickable elements */}
+        {/* CTA buttons - re-enable pointer-events for clickable elements */}
         <div ref={ctaRef} className="flex flex-col items-center gap-4 pointer-events-auto" style={{ opacity: 0 }}>
           <button
             onClick={() => window.location.href = '/app'}

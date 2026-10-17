@@ -27,54 +27,61 @@ export const Loader = ({ onComplete }: { onComplete: () => void }) => {
         },
       });
 
-      // ── Phase 1: Orbiting symbols converge fast (0s – 0.5s) ──
+      // ── Phase 1: Orbiting symbols converge (0s - 0.45s) ──
       orbitRefs.current.forEach((el, i) => {
         if (!el) return;
         const angle = (i / CODE_SYMBOLS.length) * Math.PI * 2;
-        const startRadius = 200;
+        const startRadius = 180;
         const startX = Math.cos(angle) * startRadius;
         const startY = Math.sin(angle) * startRadius;
 
         gsap.set(el, {
-          x: startX, y: startY,
-          opacity: 0, scale: 1.3,
+          x: startX,
+          y: startY,
+          opacity: 0,
+          scale: 1.2,
           rotation: Math.random() * 360,
         });
 
-        tl.to(el, { opacity: 0.7, duration: 0.15, ease: 'power2.out' }, 0.02 * i);
+        tl.to(el, { opacity: 0.75, duration: 0.15, ease: 'power2.out' }, 0.015 * i);
         tl.to(el, {
-          x: 0, y: 0, opacity: 0, scale: 0.3, rotation: 0,
-          ease: 'power2.in', duration: 0.4,
-        }, 0.15 + 0.01 * i);
+          x: 0,
+          y: 0,
+          opacity: 0,
+          scale: 0.25,
+          rotation: 0,
+          ease: 'power2.in',
+          duration: 0.35,
+        }, 0.12 + 0.01 * i);
       });
 
-      // ── Phase 2: Logo materializes (0.3s – 0.8s) ──
+      // ── Phase 2: Logo materializes with glow (0.28s - 0.75s) ──
       tl.fromTo(logo,
-        { scale: 0.2, opacity: 0, filter: 'blur(15px)' },
-        { scale: 1, opacity: 1, filter: 'blur(0px)', ease: 'power2.out', duration: 0.5 },
-        0.3
+        { scale: 0.3, opacity: 0, filter: 'blur(12px)' },
+        { scale: 1, opacity: 1, filter: 'blur(0px)', ease: 'power2.out', duration: 0.45 },
+        0.28
       );
 
       tl.fromTo(glow,
         { opacity: 0, scale: 0.3 },
         { opacity: 1, scale: 1, ease: 'power2.out', duration: 0.4 },
-        0.35
+        0.32
       );
 
       tl.fromTo(ring,
         { scale: 0.5, opacity: 0 },
         { scale: 1, opacity: 0.3, ease: 'power2.out', duration: 0.4 },
-        0.4
+        0.35
       );
 
-      // ── Phase 3: Quick hold (0.8s – 1.0s) ──
-      tl.to({}, { duration: 0.2 }, 0.8);
+      // ── Phase 3: Quick hold (0.75s - 0.95s) ──
+      tl.to({}, { duration: 0.2 }, 0.75);
 
-      // ── Phase 4: Exit — scale up & fade out (1.0s – 1.5s) ──
-      tl.to(logo, { scale: 1.8, opacity: 0, filter: 'blur(8px)', ease: 'power2.in', duration: 0.4 }, 1.0);
-      tl.to(glow, { opacity: 0, scale: 2, duration: 0.4 }, 1.0);
-      tl.to(ring, { opacity: 0, scale: 1.8, duration: 0.4 }, 1.0);
-      tl.to(container, { opacity: 0, duration: 0.3, ease: 'power2.in' }, 1.2);
+      // ── Phase 4: Smooth exit - scale up & fade out (0.95s - 1.35s) ──
+      tl.to(logo, { scale: 1.6, opacity: 0, filter: 'blur(8px)', ease: 'power2.in', duration: 0.35 }, 0.95);
+      tl.to(glow, { opacity: 0, scale: 1.8, duration: 0.35 }, 0.95);
+      tl.to(ring, { opacity: 0, scale: 1.6, duration: 0.35 }, 0.95);
+      tl.to(container, { opacity: 0, duration: 0.3, ease: 'power2.in' }, 1.05);
     }, containerRef);
 
     return () => ctx.revert();

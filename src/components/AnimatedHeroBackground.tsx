@@ -106,8 +106,11 @@ export const AnimatedHeroBackground = () => {
         ctx.beginPath();
         for (let i = 0; i < 6; i++) {
           const a = Math.PI / 3 * i - Math.PI / 6;
-          i === 0 ? ctx.moveTo(x + this.r * Math.cos(a), y + this.r * Math.sin(a))
-                  : ctx.lineTo(x + this.r * Math.cos(a), y + this.r * Math.sin(a));
+          if (i === 0) {
+            ctx.moveTo(x + this.r * Math.cos(a), y + this.r * Math.sin(a));
+          } else {
+            ctx.lineTo(x + this.r * Math.cos(a), y + this.r * Math.sin(a));
+          }
         }
         ctx.closePath();
         ctx.stroke();
@@ -267,7 +270,7 @@ export const AnimatedHeroBackground = () => {
     //  HORIZON (curved arc + floor hex grid)
     // ─────────────────────────────────────────
     const drawHorizon = (px: number, py: number) => {
-      // Horizon sits at ~68% down the screen — matching reference image exactly
+      // Horizon sits at ~68% down the screen - matching reference image exactly
       const hY = H * 0.68 + py * 0.4;
       const cX = W / 2  + px * 0.25;
 
@@ -282,7 +285,7 @@ export const AnimatedHeroBackground = () => {
       const rows = 14;
       for (let row = 0; row < rows; row++) {
         const v = (row + 0.5) / rows; // 0 = horizon, 1 = bottom
-        // depth perspective — deeper near horizon
+        // depth perspective - deeper near horizon
         const depth = 1 - v * 0.88;
         const persp = depth * depth;
         const screenY = hY + (H - hY) * (1 - persp);
@@ -313,7 +316,11 @@ export const AnimatedHeroBackground = () => {
             const a = Math.PI / 3 * k;
             const hx = screenX + hSize * Math.cos(a);
             const hy = screenY + hSize * 0.5 * Math.sin(a); // flatten vertically
-            k === 0 ? ctx.moveTo(hx, hy) : ctx.lineTo(hx, hy);
+            if (k === 0) {
+              ctx.moveTo(hx, hy);
+            } else {
+              ctx.lineTo(hx, hy);
+            }
           }
           ctx.closePath();
           ctx.stroke();
@@ -337,7 +344,7 @@ export const AnimatedHeroBackground = () => {
       // ── Horizon arc layers ──
       // Arc geometry: large ellipse positioned so only top arc is visible
       const arcRX = W * 0.72;  // horizontal radius
-      const arcRY = H * 0.28;  // vertical radius  — gives nice curve matching reference
+      const arcRY = H * 0.28;  // vertical radius  - gives nice curve matching reference
       const arcCY = hY + arcRY; // center below visible area
 
       const drawArc = (lw: number, a: number, col: string, blur: number, startAngle = Math.PI + 0.02, endAngle = Math.PI * 2 - 0.02) => {
@@ -383,7 +390,7 @@ export const AnimatedHeroBackground = () => {
     //  INIT
     // ─────────────────────────────────────────
     const init = () => {
-      // Particles — generous count for the ember effect
+      // Particles - generous count for the ember effect
       const N = Math.min(400, Math.floor(W * H / 6500));
       particles = Array.from({length: N}, () => new Particle());
 
@@ -393,7 +400,7 @@ export const AnimatedHeroBackground = () => {
       const hexW = R * Math.sqrt(3);
       const hexH = R * 1.5;
 
-      // Left — top-left quadrant only
+      // Left - top-left quadrant only
       const leftW = W * 0.34, leftH = H * 0.56;
       for (let row = -1; row < leftH / hexH + 1; row++) {
         for (let col = -1; col < leftW / hexW + 1; col++) {
@@ -407,7 +414,7 @@ export const AnimatedHeroBackground = () => {
           hexCells.push(new HexCell(cx, cy, R, 'L'));
         }
       }
-      // Right — mirror
+      // Right - mirror
       const rightStart = W * 0.66;
       for (let row = -1; row < leftH / hexH + 1; row++) {
         for (let col = -1; col < leftW / hexW + 1; col++) {

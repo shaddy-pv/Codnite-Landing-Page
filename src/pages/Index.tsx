@@ -1,69 +1,94 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import Lenis from '@studio-freight/lenis';
 import Loader from '@/components/Loader';
-import CustomCursor from '@/components/CustomCursor';
 import HeroSection from '@/components/HeroSection';
 import { Navbar } from '@/components/Navbar';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+import { runWhenIdle } from '@/lib/idle';
 
-// Lazy load below-fold sections
-const Problem = lazy(() => import('@/components/Problem'));
-const ProductReveal = lazy(() => import('@/components/ProductReveal'));
-const Features = lazy(() => import('@/components/Features'));
-const Experience = lazy(() => import('@/components/Experience'));
-const CTA = lazy(() => import('@/components/CTA'));
-const Footer = lazy(() => import('@/components/Footer'));
-const FeedbackButton = lazy(() => import('@/components/FeedbackButton'));
-const StarryBackground = lazy(() => import('@/components/StarryBackground'));
+// Statically import sections to enable synchronous hydration match
+import Problem from '@/components/Problem';
+import ProductReveal from '@/components/ProductReveal';
+import Features from '@/components/Features';
+import HallOfFame from '@/components/HallOfFame';
+import Experience from '@/components/Experience';
+import Team from '@/components/Team';
+import CTA from '@/components/CTA';
+import Footer from '@/components/Footer';
+import FeedbackButton from '@/components/FeedbackButton';
+import CosmicSpaceBackground from '@/components/CosmicSpaceBackground';
+import CustomCursor from '@/components/CustomCursor';
 
 const Index = () => {
   const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.25,
-      wheelMultiplier: 1.2,
-      smoothTouch: false,
-    } as any);
+    let lenis: Lenis | null = null;
+    let updateFn: ((time: number) => void) | null = null;
 
-    // Synchronize GSAP ScrollTrigger with Lenis
-    lenis.on('scroll', ScrollTrigger.update);
+    const cleanupIdle = runWhenIdle(() => {
+      gsap.registerPlugin(ScrollTrigger);
 
-    const update = (time: number) => {
-      lenis.raf(time * 1000);
-    };
+      lenis = new Lenis({
+        duration: 0.65,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1.1,
+        touchMultiplier: 1.5,
+        infinite: false,
+      } as any);
 
-    gsap.ticker.add(update);
-    gsap.ticker.lagSmoothing(0);
+      // Synchronize GSAP ScrollTrigger with Lenis
+      lenis.on('scroll', ScrollTrigger.update);
+      (window as any).lenis = lenis;
+
+      updateFn = (time: number) => {
+        lenis?.raf(time * 1000);
+      };
+
+      gsap.ticker.add(updateFn);
+      gsap.ticker.lagSmoothing(200, 16);
+    });
 
     return () => {
-      gsap.ticker.remove(update);
-      lenis.destroy();
+      cleanupIdle();
+      (window as any).lenis = null;
+      if (updateFn) {
+        gsap.ticker.remove(updateFn);
+      }
+      if (lenis) {
+        lenis.destroy();
+      }
     };
   }, []);
 
   return (
-    <div className="bg-[#0A0A0A] overflow-x-hidden relative selection:bg-orange-500/30 selection:text-orange-200">
+    <div className="bg-[#080808] text-white overflow-x-clip relative selection:bg-orange-500/30 selection:text-orange-200 min-h-screen">
+      {/* Full-Page Unified Cosmic Space Background across every section */}
+      <CosmicSpaceBackground />
+
+      {/* Global Mouse Effect: Hacktron-Style Crosshairs, Telemetry HUD & Target Ring */}
       <CustomCursor />
 
       {!loadingComplete && <Loader onComplete={() => setLoadingComplete(true)} />}
 
-      <Navbar />
-      <HeroSection />
-
-      <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A]" />}>
-        <StarryBackground />
+      <div className="relative z-10">
+        <Navbar />
+        <HeroSection isLoaded={loadingComplete} />
         <Problem />
         <ProductReveal />
         <Features />
+        <HallOfFame />
         <Experience />
+        <Team />
         <CTA />
         <Footer />
         <FeedbackButton />
-      </Suspense>
+      </div>
     </div>
   );
 };

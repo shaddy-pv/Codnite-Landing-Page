@@ -2,13 +2,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Eye } from 'lucide-react';
 
+const getAppUrl = (path: string = '') => {
+  if (typeof window !== 'undefined' && window.location.port === '4173') {
+    return `http://localhost:5173/app${path}`;
+  }
+  return `/app${path}`;
+};
+
 export const CTA = React.memo(() => {
   return (
-    <section className="min-h-[80vh] bg-transparent flex items-center justify-center px-6 py-32 relative overflow-hidden">
-      {/* Cinematic noise and glows */}
-      <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none z-0" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,106,0,0.08)_0%,transparent_60%)] blur-3xl mix-blend-screen pointer-events-none" />
-
+    <section className="relative bg-transparent flex items-center justify-center px-4 sm:px-6 py-12 sm:py-18 md:py-24 overflow-hidden">
       {/* Section top divider */}
       <div className="absolute top-0 left-0 right-0 section-divider" />
 
@@ -23,7 +26,7 @@ export const CTA = React.memo(() => {
             transition: { staggerChildren: 0.2 }
           }
         }}
-        className="max-w-4xl text-center relative z-10"
+        className="max-w-4xl text-center relative z-10 w-full"
       >
         <motion.h2
           variants={{
@@ -34,14 +37,13 @@ export const CTA = React.memo(() => {
               transition: { duration: 0.8, ease: "easeOut" }
             }
           }}
-          className="text-[2.5rem] sm:text-[4rem] md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight"
+          className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-[1.12] tracking-tight"
         >
           Ready to stop watching
           <br />
-          and start{' '}
+          <span>and start </span>
           <span className="text-transparent bg-clip-text" style={{
             backgroundImage: 'linear-gradient(135deg, #FF6A00, #FFB340)',
-            filter: 'drop-shadow(0 0 30px rgba(255,106,0,0.4))',
           }}>building</span>?
         </motion.h2>
 
@@ -54,7 +56,7 @@ export const CTA = React.memo(() => {
               transition: { duration: 0.6, ease: "easeOut" }
             }
           }}
-          className="text-gray-500 text-lg md:text-xl mb-12 max-w-lg mx-auto"
+          className="text-gray-400 text-sm sm:text-base md:text-lg mb-8 sm:mb-10 max-w-lg mx-auto leading-relaxed"
         >
           Join a community of developers who learn by doing - together.
         </motion.p>
@@ -68,25 +70,25 @@ export const CTA = React.memo(() => {
               transition: { duration: 0.8, ease: "easeOut" }
             }
           }}
-          className="flex flex-col items-center gap-5"
+          className="flex flex-col items-center gap-4 sm:gap-5 w-full max-w-sm sm:max-w-none mx-auto"
         >
           {/* Primary CTA */}
           <button
-            onClick={() => window.location.href = '/app'}
-            className="magnetic-btn cta-breathe group relative px-12 py-5 bg-[#FF6A00] text-white text-xl font-semibold rounded-full hover:bg-[hsl(24,100%,55%)] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,106,0,0.5)] hover:shadow-[0_0_60px_-15px_rgba(255,106,0,0.7)] hover:-translate-y-1 overflow-hidden"
+            onClick={() => window.location.href = getAppUrl()}
+            className="magnetic-btn group relative px-8 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-[#FF6A00] to-[#FFA229] text-black text-base sm:text-lg font-bold rounded-full hover:from-[#ff7919] hover:to-[#ffb24d] transition-all duration-300 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.4)] hover:-translate-y-0.5 active:translate-y-0 overflow-hidden w-full sm:w-auto text-center justify-center flex items-center"
             data-cursor-hover
           >
-            <span className="relative z-10 flex items-center gap-3">
+            <span className="relative z-10 flex items-center justify-center gap-3">
               Join Codnite
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
             </span>
             <div className="absolute inset-0 rounded-full border border-white/20 edge-highlight pointer-events-none" />
           </button>
 
-          {/* Secondary CTA — Try as Guest */}
+          {/* Secondary CTA - Try as Guest */}
           <button
-            onClick={() => window.location.href = '/app'}
-            className="magnetic-btn group flex items-center gap-2 px-8 py-3 rounded-full border border-white/10 text-gray-400 hover:text-white hover:border-[#FF6A00]/30 transition-all duration-300 text-sm font-medium hover:-translate-y-0.5"
+            onClick={() => window.location.href = getAppUrl()}
+            className="magnetic-btn group flex items-center justify-center gap-2 px-7 sm:px-8 py-3 rounded-full border border-white/10 text-gray-400 hover:text-white hover:border-[#FF6A00]/30 transition-all duration-300 text-sm font-medium hover:-translate-y-0.5 w-full sm:w-auto"
             data-cursor-hover
           >
             <Eye className="w-4 h-4" />
@@ -94,8 +96,8 @@ export const CTA = React.memo(() => {
           </button>
 
           {/* Sign-up methods */}
-          <div className="flex items-center gap-3 mt-2">
-            <span className="text-gray-600 text-xs font-medium tracking-widest uppercase">
+          <div className="flex items-center gap-3 mt-1 sm:mt-2">
+            <span className="text-gray-500 text-xs font-medium tracking-widest uppercase">
               Sign up with
             </span>
             <div className="flex items-center gap-2">
